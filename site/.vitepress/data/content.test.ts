@@ -1,3 +1,6 @@
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { describe, expect, it } from 'vitest'
 
 import {
@@ -5,6 +8,11 @@ import {
   normalizeSiteUrl,
   pagePathFromRelativePath,
 } from '../../../scripts/generate-feed'
+import {
+  discoverDraftSourcePaths,
+  draftSourcePaths,
+  isDraftSitemapUrl,
+} from '../../../scripts/discover-drafts'
 import { parsePost, parseProject, visibleByDate } from './content'
 
 describe('content metadata', () => {
@@ -148,6 +156,21 @@ describe('RSS feed items', () => {
     expect(() => normalizeSiteUrl(siteUrl)).toThrow(/站点 URL.*根地址/)
   })
 
+  it.each([
+    'http://localhost:5173',
+    'http://localhost.',
+    'http://127.0.0.1',
+    'http://[::1]',
+    'http://[::ffff:127.0.0.1]',
+  ])('rejects a loopback production site URL: %s', (siteUrl) => {
+    expect(() => normalizeSiteUrl(siteUrl)).toThrow(/站点 URL.*本地|loopback/i)
+  })
+
+  it('allows localhost only when explicitly enabled for development', () => {
+    expect(normalizeSiteUrl('http://localhost:5173', { allowLoopback: true }))
+      .toBe('http://localhost:5173/')
+  })
+
   it('reports the post URL when a date is invalid', () => {
     expect(() =>
       buildFeedItems([
@@ -174,5 +197,98 @@ describe('canonical page paths', () => {
     ['posts/hello-world.md', '/posts/hello-world'],
   ])('maps %s to %s', (relativePath, expected) => {
     expect(pagePathFromRelativePath(relativePath)).toBe(expected)
+  })
+})
+
+describe('draft source discovery', () => {
+  it('returns only draft post and project detail source paths', () => {
+    const pages = [
+      {
+        relativePath: 'posts/index.md',
+        frontmatter: { title: '文章', description: '文章列表' },
+      },
+      {
+        relativePath: 'posts/published.md',
+        frontmatter: {
+          title: '已发布文章', description: '摘要', date: '2026-08-25',
+          category: '工程', tags: [], draft: false,
+        },
+      },
+      {
+        relativePath: 'posts/draft-post.md',
+        frontmatter: {
+          title: '草稿文章', description: '摘要', date: '2026-08-24',
+          category: '工程', tags: [], draft: true,
+        },
+      },
+      {
+        relativePath: 'projects/draft-project.md',
+        frontmatter: {
+          title: '草稿项目', description: '摘要', date: '2026-08-23',
+          tags: [], draft: true,
+        },
+      },
+      {
+        relativePath: 'posts/series/index.md',
+        frontmatter: {
+          title: '嵌套草稿', description: '摘要', date: '2026-08-22',
+          category: '工程', tags: [], draft: true,
+        },
+      },
+    ]
+
+    expect(draftSourcePaths(pages)).toEqual([
+      'posts/draft-post.md',
+      'projects/draft-project.md',
+      'posts/series/index.md',
+    ])
+  })
+
+  it('reports the source path for invalid detail frontmatter', () => {
+    expect(() => draftSourcePaths([{
+      relativePath: 'posts/broken.md',
+      frontmatter: {
+        title: '损坏文章', date: '2026-08-25', category: '工程', tags: [], draft: true,
+      },
+    }])).toThrow(/posts\/broken\.md.*frontmatter/)
+  })
+
+  it.each([
+    '/posts/draft-post',
+    'posts/draft-post',
+    'https://example.com/posts/draft-post',
+  ])('recognizes draft sitemap URLs in relative or absolute form: %s', (url) => {
+    expect(isDraftSitemapUrl(url, new Set(['/posts/draft-post']), 'https://example.com/'))
+      .toBe(true)
+  })
+
+  it('recognizes a URL-encoded Unicode draft sitemap route', () => {
+    expect(isDraftSitemapUrl(
+      '/posts/%E8%8D%89%E7%A8%BF',
+      new Set(['/posts/草稿']),
+      'https://example.com/',
+    )).toBe(true)
+  })
+
+  it('discovers drafts from Markdown files in a temporary site', async () => {
+    const siteRoot = await mkdtemp(join(tmpdir(), 'draft-discovery-'))
+    try {
+      await mkdir(join(siteRoot, 'posts'))
+      await mkdir(join(siteRoot, 'projects'))
+      await writeFile(join(siteRoot, 'posts', 'index.md'), '---\ntitle: 文章\ndescription: 列表\n---\n')
+      await writeFile(join(siteRoot, 'posts', 'published.md'), [
+        '---', 'title: 已发布', 'description: 摘要', "date: '2026-08-25'",
+        'category: 工程', 'tags: []', 'draft: false', '---', '',
+      ].join('\n'))
+      await writeFile(join(siteRoot, 'projects', 'draft.md'), [
+        '---', 'title: 草稿项目', 'description: 摘要', "date: '2026-08-24'",
+        'tags: []', 'draft: true', '---', '',
+      ].join('\n'))
+
+      await expect(discoverDraftSourcePaths(siteRoot))
+        .resolves.toEqual(['projects/draft.md'])
+    } finally {
+      await rm(siteRoot, { recursive: true, force: true })
+    }
   })
 })

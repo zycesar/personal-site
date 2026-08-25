@@ -1,7 +1,9 @@
 import { stat, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { defineConfig, type HeadConfig } from 'vitepress'
 
+import { discoverDraftSourcePaths, isDraftSitemapUrl } from '../../scripts/discover-drafts'
 import {
   generateFeed,
   normalizeSiteUrl,
@@ -19,7 +21,15 @@ if (isProductionBuild && !configuredSiteUrl) {
   throw new Error('生产构建缺少 VITE_SITE_URL，请设置为站点的绝对 HTTP(S) 地址后重试。')
 }
 
-const siteUrl = normalizeSiteUrl(configuredSiteUrl ?? 'http://localhost:5173')
+const siteUrl = normalizeSiteUrl(
+  configuredSiteUrl ?? 'http://localhost:5173',
+  { allowLoopback: !isProductionBuild },
+)
+const siteRoot = fileURLToPath(new URL('..', import.meta.url))
+const draftPaths = await discoverDraftSourcePaths(siteRoot)
+const draftRoutePaths = new Set(
+  draftPaths.map((path) => pagePathFromRelativePath(path).normalize('NFC')),
+)
 const posts = new Map<string, FeedPost>()
 
 function absoluteUrl(path: string): string {
@@ -44,7 +54,13 @@ export default defineConfig({
   title: SITE_TITLE,
   description: SITE_DESCRIPTION,
   cleanUrls: true,
-  sitemap: { hostname: siteUrl },
+  srcExclude: isProductionBuild ? draftPaths : [],
+  sitemap: {
+    hostname: siteUrl,
+    transformItems(items) {
+      return items.filter((item) => !isDraftSitemapUrl(item.url, draftRoutePaths, siteUrl))
+    },
+  },
   transformPageData(pageData) {
     const relativePath = pageData.relativePath.replaceAll('\\', '/')
     if (!relativePath.startsWith('posts/') || relativePath === 'posts/index.md') return

@@ -6,7 +6,26 @@ import { type ContentPage, parsePost, visibleByDate } from '../site/.vitepress/d
 
 export type FeedPost = ContentPage
 
-export function normalizeSiteUrl(siteUrl: string): string {
+export interface NormalizeSiteUrlOptions {
+  allowLoopback?: boolean
+}
+
+function isLoopbackHostname(hostname: string): boolean {
+  const normalized = hostname
+    .toLowerCase()
+    .replace(/^\[|\]$/g, '')
+    .replace(/\.+$/, '')
+  return normalized === 'localhost'
+    || normalized.endsWith('.localhost')
+    || normalized === '::1'
+    || /^127(?:\.\d{1,3}){3}$/.test(normalized)
+    || /^::ffff:7f[0-9a-f]{2}:[0-9a-f]{1,4}$/.test(normalized)
+}
+
+export function normalizeSiteUrl(
+  siteUrl: string,
+  { allowLoopback = false }: NormalizeSiteUrlOptions = {},
+): string {
   let url: URL
   try {
     url = new URL(siteUrl)
@@ -25,6 +44,9 @@ export function normalizeSiteUrl(siteUrl: string): string {
     || url.hash
   ) {
     throw new Error(`站点 URL 必须是无凭据、路径、查询参数或片段的站点根地址：${siteUrl}`)
+  }
+  if (!allowLoopback && isLoopbackHostname(url.hostname)) {
+    throw new Error(`生产站点 URL 不能使用 localhost 或 loopback 本地地址：${siteUrl}`)
   }
   return `${url.origin}/`
 }
