@@ -1,0 +1,32 @@
+{
+  "name": "wang-yongzhong-personal-site",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vitepress dev site",
+    "build": "vitepress build site",
+    "preview": "vitepress preview site",
+    "typecheck": "vue-tsc --noEmit",
+    "test": "vitest run",
+    "test:e2e": "playwright test",
+    "check:links": "node scripts/check-links.mjs",
+    "check": "pnpm typecheck && pnpm test && pnpm build && pnpm check:links"
+  },
+  "dependencies": {
+    "feed": "latest",
+    "vitepress": "latest",
+    "vue": "latest",
+    "zod": "latest"
+  },
+  "devDependencies": {
+    "@playwright/test": "latest",
+    "@types/node": "latest",
+    "@vitejs/plugin-vue": "latest",
+    "@vue/test-utils": "latest",
+    "jsdom": "latest",
+    "typescript": "latest",
+    "vite": "latest",
+    "vitest": "latest",
+    "vue-tsc": "latest"
+  }
+}
