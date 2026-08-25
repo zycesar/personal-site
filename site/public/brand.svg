@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320" role="img" aria-labelledby="title">
+  <title id="title">王永忠个人品牌的永字图形</title>
+  <defs>
+    <linearGradient id="brand-gradient" x1="32" y1="24" x2="286" y2="300" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7868ff"/>
+      <stop offset="1" stop-color="#355bd8"/>
+    </linearGradient>
+  </defs>
+  <circle cx="160" cy="160" r="152" fill="url(#brand-gradient)"/>
+  <circle cx="160" cy="160" r="135" fill="none" stroke="#fff" stroke-opacity=".14" stroke-width="2"/>
+  <text x="160" y="211" fill="#fff" font-family="sans-serif" font-size="150" font-weight="700" text-anchor="middle">永</text>
+</svg>
