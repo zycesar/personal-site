@@ -15,6 +15,20 @@ describe('content metadata', () => {
     ).toThrow(/description/)
   })
 
+  it('rejects unknown post metadata keys', () => {
+    expect(() =>
+      parsePost({
+        title: '文章',
+        description: '摘要',
+        date: '2026-08-25',
+        category: 'Vue',
+        tags: [],
+        draft: false,
+        typo: 'silently accepted',
+      }),
+    ).toThrow()
+  })
+
   it('requires a visible example marker for example projects', () => {
     expect(() =>
       parseProject({
@@ -27,6 +41,31 @@ describe('content metadata', () => {
         example: true,
       }),
     ).toThrow(/exampleLabel/)
+  })
+
+  it('accepts example projects with a visible example marker', () => {
+    expect(
+      parseProject({
+        title: '案例',
+        description: '摘要',
+        date: '2026-08-25',
+        tags: ['Vue'],
+        example: true,
+        exampleLabel: '查看示例',
+      }),
+    ).toMatchObject({ example: true, exampleLabel: '查看示例' })
+  })
+
+  it('accepts non-example projects without a visible example marker', () => {
+    expect(
+      parseProject({
+        title: '案例',
+        description: '摘要',
+        date: '2026-08-25',
+        tags: ['Vue'],
+        example: false,
+      }),
+    ).toMatchObject({ example: false })
   })
 
   it('filters drafts and sorts newest content first', () => {

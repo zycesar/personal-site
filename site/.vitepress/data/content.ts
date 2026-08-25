@@ -7,7 +7,7 @@ const commonSchema = z.object({
   tags: z.array(z.string()),
   draft: z.boolean().default(false),
   cover: z.string().optional(),
-})
+}).strict()
 
 export const postSchema = commonSchema.extend({
   category: z.string().min(1),
