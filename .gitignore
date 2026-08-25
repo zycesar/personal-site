@@ -2,9 +2,9 @@ node_modules/
 .vitepress/cache/
 .vitepress/dist/
 .superpowers/
+.worktrees/
 coverage/
 playwright-report/
 test-results/
 .env*
 !.env.example
-
