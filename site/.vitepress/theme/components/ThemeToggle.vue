@@ -1,24 +1,10 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { useData } from 'vitepress'
 
-const isDark = ref(false)
-
-function applyTheme() {
-  document.documentElement.classList.toggle('dark', isDark.value)
-}
-
-onMounted(() => {
-  const savedTheme = localStorage.getItem('theme')
-  isDark.value = savedTheme
-    ? savedTheme === 'dark'
-    : (window.matchMedia?.('(prefers-color-scheme: dark)').matches ?? false)
-  applyTheme()
-})
+const { isDark } = useData()
 
 function toggleTheme() {
   isDark.value = !isDark.value
-  applyTheme()
-  localStorage.setItem('theme', isDark.value ? 'dark' : 'light')
 }
 </script>
 

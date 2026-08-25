@@ -17,14 +17,15 @@ const links = [
 
     <button
       type="button"
-      aria-label="打开导航菜单"
+      :aria-label="open ? '关闭导航菜单' : '打开导航菜单'"
       :aria-expanded="open"
+      aria-controls="primary-navigation"
       @click="open = !open"
     >
       <span aria-hidden="true">☰</span>
     </button>
 
-    <nav aria-label="主导航" :data-open="String(open)">
+    <nav id="primary-navigation" aria-label="主导航" :data-open="String(open)">
       <a
         v-for="link in links"
         :key="link.href"
