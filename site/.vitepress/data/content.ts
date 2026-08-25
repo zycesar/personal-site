@@ -9,11 +9,11 @@ const commonSchema = z.object({
   cover: z.string().optional(),
 })
 
-const postSchema = commonSchema.extend({
+export const postSchema = commonSchema.extend({
   category: z.string().min(1),
 })
 
-const projectSchema = commonSchema
+export const projectSchema = commonSchema
   .extend({
     featured: z.boolean().default(false),
     example: z.boolean().default(false),
