@@ -2,6 +2,12 @@ import { expect, type Page, test } from '@playwright/test'
 
 const mobileMenu = (page: Page) => page.locator('button[aria-controls="primary-navigation"]')
 const primaryNavigation = (page: Page) => page.locator('nav[aria-label="主导航"]')
+const deploymentBasePath = `/${(process.env.VITE_BASE_PATH ?? '/').replace(/^\/+|\/+$/g, '')}/`
+
+function sitePath(path = '/'): string {
+  if (path === '/') return deploymentBasePath
+  return `${deploymentBasePath.replace(/\/$/, '')}/${path.replace(/^\/+/, '')}`
+}
 
 async function expectNoHorizontalOverflow(page: Page): Promise<void> {
   const hasNoHorizontalOverflow = await page.evaluate(
@@ -25,7 +31,7 @@ async function openMobileMenuIfVisible(page: Page): Promise<boolean> {
 }
 
 async function navigateFromHome(page: Page, label: string, path: RegExp): Promise<void> {
-  await page.goto('/')
+  await page.goto(sitePath())
   const usedMobileMenu = await openMobileMenuIfVisible(page)
   const link = primaryNavigation(page).getByRole('link', { name: label, exact: true })
   await expect(link).toBeVisible()
@@ -39,7 +45,7 @@ async function navigateFromHome(page: Page, label: string, path: RegExp): Promis
 }
 
 test('covers the critical visitor journey', async ({ page }) => {
-  await page.goto('/')
+  await page.goto(sitePath())
   await expect(page.getByRole('heading', { level: 1 })).toContainText('好用的体验')
   await expectNoHorizontalOverflow(page)
 
@@ -47,7 +53,7 @@ test('covers the critical visitor journey', async ({ page }) => {
   await navigateFromHome(page, '文章', /\/posts\/$/)
   await navigateFromHome(page, '关于', /\/about\/?$/)
 
-  await page.goto('/projects/')
+  await page.goto(sitePath('/projects/'))
   await expect(page.getByRole('heading', { level: 1, name: '项目' })).toBeVisible()
   await expectNoHorizontalOverflow(page)
   await expect(page.locator('[data-example]', { hasText: '示例项目' })).toHaveCount(2)
@@ -66,7 +72,7 @@ test('covers the critical visitor journey', async ({ page }) => {
   await expectNoHorizontalOverflow(page)
   await expect(page.getByRole('heading', { name: '这个页面不存在' })).toHaveCount(0)
 
-  await page.goto('/posts/')
+  await page.goto(sitePath('/posts/'))
   await expect(page.getByRole('heading', { level: 1, name: '文章' })).toBeVisible()
   await expectNoHorizontalOverflow(page)
   const articleCards = page.locator('a.post-card')
@@ -86,7 +92,7 @@ test('covers the critical visitor journey', async ({ page }) => {
 })
 
 test('persists an explicit dark theme and renders the custom 404', async ({ page }) => {
-  await page.goto('/')
+  await page.goto(sitePath())
   const themeToggle = page.getByRole('button', { name: '切换到深色模式' })
   await expect(themeToggle).toBeVisible()
   await themeToggle.click()
@@ -96,7 +102,7 @@ test('persists an explicit dark theme and renders the custom 404', async ({ page
   await expect(page.locator('html')).toHaveClass(/\bdark\b/)
   await expect(page.getByRole('button', { name: '切换到浅色模式' })).toBeVisible()
 
-  await page.goto('/missing-page')
+  await page.goto(sitePath('/missing-page'))
   await expect(page.getByRole('heading', { level: 1, name: '这个页面不存在' })).toBeVisible()
   await expect(page.getByRole('link', { name: '返回首页' })).toBeVisible()
 })
@@ -112,7 +118,7 @@ test('hydrates cleanly from the system dark preference', async ({ page }) => {
   page.on('pageerror', (error) => pageErrors.push(error.message))
 
   await page.emulateMedia({ colorScheme: 'dark' })
-  await page.goto('/')
+  await page.goto(sitePath())
   await expect(page.locator('html')).toHaveClass(/\bdark\b/)
   await expect(page.getByRole('button', { name: '切换到浅色模式' })).toBeVisible()
 
@@ -122,7 +128,7 @@ test('hydrates cleanly from the system dark preference', async ({ page }) => {
 
 test('disables card transitions when reduced motion is requested', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' })
-  await page.goto('/')
+  await page.goto(sitePath())
   const transitionDurations = await page.locator('.card').first().evaluate((card) =>
     getComputedStyle(card).transitionDuration.split(',').map((duration) => duration.trim()),
   )
@@ -135,7 +141,7 @@ test('disables card transitions when reduced motion is requested', async ({ page
 test('mobile menu exposes links and closes after navigation', async ({ page }, testInfo) => {
   test.skip(testInfo.project.use.isMobile !== true, 'Mobile-specific responsive behavior')
 
-  await page.goto('/')
+  await page.goto(sitePath())
   const navigation = primaryNavigation(page)
   await expect(navigation).toHaveAttribute('data-open', 'false')
   await expect(navigation).toBeHidden()

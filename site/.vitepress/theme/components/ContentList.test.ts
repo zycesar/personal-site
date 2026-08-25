@@ -51,7 +51,10 @@ vi.mock('vitepress', async () => {
   const { ref } = await vi.importActual<typeof import('vue')>('vue')
   const frontmatter = ref(mockedFrontmatter)
 
-  return { useData: () => ({ frontmatter }) }
+  return {
+    useData: () => ({ frontmatter }),
+    withBase: (path: string) => `/personal-site${path}`,
+  }
 })
 
 import ContentList from './ContentList.vue'
@@ -73,7 +76,7 @@ describe('ContentList', () => {
     expect(wrapper.get('.content-list-intro').text()).toBe('来自 Frontmatter 的简介。')
 
     const card = wrapper.get('a.content-card')
-    expect(card.attributes('href')).toBe('/projects/alpha')
+    expect(card.attributes('href')).toBe('/personal-site/projects/alpha')
     expect(card.get('h2').text()).toBe('项目甲')
     expect(card.find('h3').exists()).toBe(false)
     expect(card.text()).toContain('项目甲描述')
@@ -92,7 +95,7 @@ describe('ContentList', () => {
 
     expect(wrapper.get('h1').text()).toBe('文章页 Frontmatter 标题')
     expect(wrapper.get('.content-list-intro').text()).toBe('文章页 Frontmatter 简介。')
-    expect(wrapper.get('a.content-card').attributes('href')).toBe('/posts/alpha')
+    expect(wrapper.get('a.content-card').attributes('href')).toBe('/personal-site/posts/alpha')
     expect(wrapper.get('a.content-card h2').text()).toBe('文章甲')
     expect(wrapper.find('a.content-card h3').exists()).toBe(false)
     expect(wrapper.find('[data-example]').exists()).toBe(false)

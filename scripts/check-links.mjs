@@ -28,7 +28,12 @@ function extractHrefs(html) {
   return hrefs
 }
 
-function candidatesForHref(href, distDir) {
+function normalizeBasePath(basePath) {
+  const normalized = `/${basePath.replace(/^\/+|\/+$/g, '')}/`
+  return normalized === '//' ? '/' : normalized
+}
+
+function candidatesForHref(href, distDir, basePath) {
   const pathname = href.split(/[?#]/, 1)[0]
   if (!pathname || !pathname.startsWith('/') || pathname.startsWith('//')) return []
 
@@ -40,6 +45,14 @@ function candidatesForHref(href, distDir) {
   }
   if (decoded.includes('\0') || decoded.includes('\\') || decoded.split('/').includes('..')) {
     throw new Error('链接包含目录穿越')
+  }
+
+  const normalizedBasePath = normalizeBasePath(basePath)
+  const baseWithoutTrailingSlash = normalizedBasePath.replace(/\/$/, '')
+  if (normalizedBasePath !== '/') {
+    if (decoded === baseWithoutTrailingSlash) decoded = '/'
+    else if (decoded.startsWith(normalizedBasePath)) decoded = `/${decoded.slice(normalizedBasePath.length)}`
+    else throw new Error(`链接未包含部署基础路径 ${normalizedBasePath}`)
   }
 
   const extension = extname(decoded).toLowerCase()
@@ -58,7 +71,10 @@ function staysInsideDist(path, distDir) {
   return pathFromDist !== '..' && !pathFromDist.startsWith(`..${sep}`) && !isAbsolute(pathFromDist)
 }
 
-export async function checkBuiltLinks(distDirectory = defaultDistDir) {
+export async function checkBuiltLinks(
+  distDirectory = defaultDistDir,
+  { basePath = '/' } = {},
+) {
   const distDir = resolve(distDirectory)
   const distFiles = await findFiles(distDir)
   const htmlPaths = distFiles.filter((path) => path.endsWith('.html'))
@@ -71,7 +87,7 @@ export async function checkBuiltLinks(distDirectory = defaultDistDir) {
     for (const href of extractHrefs(html)) {
       let candidates
       try {
-        candidates = candidatesForHref(href, distDir)
+        candidates = candidatesForHref(href, distDir, basePath)
       } catch (error) {
         failures.push({ source, href, reason: error.message })
         continue
@@ -92,7 +108,9 @@ export async function checkBuiltLinks(distDirectory = defaultDistDir) {
 }
 
 export async function runLinkCheck(distDir = defaultDistDir) {
-  const result = await checkBuiltLinks(distDir)
+  const result = await checkBuiltLinks(distDir, {
+    basePath: process.env.VITE_BASE_PATH ?? '/',
+  })
   if (result.failures.length > 0) {
     console.error(`发现 ${result.failures.length} 个无效内部链接：`)
     for (const failure of result.failures) {

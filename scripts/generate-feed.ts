@@ -39,16 +39,20 @@ export function normalizeSiteUrl(
   if (
     url.username
     || url.password
-    || url.pathname !== '/'
     || url.search
     || url.hash
   ) {
-    throw new Error(`站点 URL 必须是无凭据、路径、查询参数或片段的站点根地址：${siteUrl}`)
+    throw new Error(`站点 URL 必须是无凭据、查询参数或片段的站点根地址（可含部署路径）：${siteUrl}`)
   }
   if (!allowLoopback && isLoopbackHostname(url.hostname)) {
     throw new Error(`生产站点 URL 不能使用 localhost 或 loopback 本地地址：${siteUrl}`)
   }
-  return `${url.origin}/`
+  const pathname = url.pathname.endsWith('/') ? url.pathname : `${url.pathname}/`
+  return `${url.origin}${pathname}`
+}
+
+function absoluteSiteUrl(path: string, siteUrl: string): string {
+  return new URL(path.replace(/^\/+/, ''), normalizeSiteUrl(siteUrl)).href
 }
 
 export function pagePathFromRelativePath(relativePath: string): string {
@@ -80,7 +84,7 @@ export function buildFeedItems(posts: FeedPost[], siteUrl: string): Item[] {
     return {
       title: metadata.title,
       description: metadata.description,
-      link: new URL(post.url, normalizedSiteUrl).href,
+      link: absoluteSiteUrl(post.url, normalizedSiteUrl),
       date,
     }
   })

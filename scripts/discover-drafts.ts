@@ -72,5 +72,9 @@ export function isDraftSitemapUrl(
   siteUrl: string,
 ): boolean {
   const pathname = decodeURIComponent(new URL(itemUrl, siteUrl).pathname).normalize('NFC')
-  return draftRoutePaths.has(pathname)
+  const basePath = new URL(siteUrl).pathname.replace(/\/$/, '')
+  const routePath = basePath && pathname === basePath
+    ? '/'
+    : (basePath && pathname.startsWith(`${basePath}/`) ? pathname.slice(basePath.length) : pathname)
+  return draftRoutePaths.has(routePath)
 }

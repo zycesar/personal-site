@@ -12,6 +12,7 @@ vi.mock('vitepress', async () => {
   return {
     mockedIsDark,
     useData: () => ({ isDark: mockedIsDark }),
+    withBase: (path: string) => `/personal-site${path}`,
   }
 })
 
@@ -47,7 +48,8 @@ describe('SiteHeader', () => {
     expect(menuButton.attributes('aria-expanded')).toBe('true')
     expect(menuButton.attributes('aria-label')).toBe('关闭导航菜单')
 
-    const projectLink = wrapper.get('a[href="/projects/"]')
+    expect(wrapper.get('a[aria-label="王永忠首页"]').attributes('href')).toBe('/personal-site/')
+    const projectLink = wrapper.get('a[href="/personal-site/projects/"]')
     projectLink.element.addEventListener('click', (event) => event.preventDefault())
     await projectLink.trigger('click')
 

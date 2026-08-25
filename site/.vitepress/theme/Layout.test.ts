@@ -15,6 +15,7 @@ vi.mock('vitepress', async () => {
   return {
     Content: defineComponent({ template: '<div>Markdown content</div>' }),
     useData: () => ({ frontmatter, page, isDark }),
+    withBase: (path: string) => `/personal-site${path}`,
   }
 })
 
@@ -43,7 +44,7 @@ describe('Layout', () => {
     const wrapper = mount(Layout)
 
     expect(wrapper.get('h1').text()).toBe('这个页面不存在')
-    expect(wrapper.get('.not-found a[href="/"]').text()).toBe('返回首页')
+    expect(wrapper.get('.not-found a[href="/personal-site/"]').text()).toBe('返回首页')
   })
 
   it.each(['projects', 'posts'] as const)('dispatches %s index pages to ContentList', (kind) => {

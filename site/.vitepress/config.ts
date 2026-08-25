@@ -25,6 +25,7 @@ const siteUrl = normalizeSiteUrl(
   configuredSiteUrl ?? 'http://localhost:5173',
   { allowLoopback: !isProductionBuild },
 )
+const basePath = new URL(siteUrl).pathname
 const siteRoot = fileURLToPath(new URL('..', import.meta.url))
 const draftPaths = await discoverDraftSourcePaths(siteRoot)
 const draftRoutePaths = new Set(
@@ -33,7 +34,7 @@ const draftRoutePaths = new Set(
 const posts = new Map<string, FeedPost>()
 
 function absoluteUrl(path: string): string {
-  return new URL(path, siteUrl).href
+  return new URL(path.replace(/^\/+/, ''), siteUrl).href
 }
 
 async function waitForSitemap(sitemapPath: string): Promise<void> {
@@ -50,6 +51,7 @@ async function waitForSitemap(sitemapPath: string): Promise<void> {
 }
 
 export default defineConfig({
+  base: basePath,
   lang: 'zh-CN',
   title: SITE_TITLE,
   description: SITE_DESCRIPTION,

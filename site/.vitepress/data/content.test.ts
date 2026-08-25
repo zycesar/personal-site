@@ -143,17 +143,37 @@ describe('RSS feed items', () => {
     expect(items[0].date.toISOString()).toBe('2026-08-25T00:00:00.000Z')
   })
 
+  it('preserves a repository base path in feed item links', () => {
+    const items = buildFeedItems([{
+      url: '/posts/github-pages',
+      frontmatter: {
+        title: 'GitHub Pages',
+        description: '子路径部署',
+        date: '2026-08-25',
+        category: '工程',
+        tags: ['VitePress'],
+        draft: false,
+      },
+    }], 'https://example.com/personal-site/')
+
+    expect(items[0]?.link).toBe('https://example.com/personal-site/posts/github-pages')
+  })
+
   it('reports an explicit error for an invalid site URL', () => {
     expect(() => buildFeedItems([], 'not-an-absolute-url')).toThrow(/站点 URL/)
   })
 
   it.each([
     'https://user@example.com/',
-    'https://example.com/base/',
     'https://example.com/?tenant=one',
     'https://example.com/#fragment',
   ])('rejects a site URL that is not a clean origin: %s', (siteUrl) => {
     expect(() => normalizeSiteUrl(siteUrl)).toThrow(/站点 URL.*根地址/)
+  })
+
+  it('accepts and normalizes a repository deployment path', () => {
+    expect(normalizeSiteUrl('https://example.com/personal-site'))
+      .toBe('https://example.com/personal-site/')
   })
 
   it.each([
@@ -267,6 +287,14 @@ describe('draft source discovery', () => {
       '/posts/%E8%8D%89%E7%A8%BF',
       new Set(['/posts/草稿']),
       'https://example.com/',
+    )).toBe(true)
+  })
+
+  it('recognizes draft sitemap URLs under a repository base path', () => {
+    expect(isDraftSitemapUrl(
+      '/personal-site/posts/draft-post',
+      new Set(['/posts/draft-post']),
+      'https://example.com/personal-site/',
     )).toBe(true)
   })
 

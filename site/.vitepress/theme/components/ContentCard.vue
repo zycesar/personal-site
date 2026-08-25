@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { withBase } from 'vitepress'
+
 withDefaults(defineProps<{
   url: string
   title: string
@@ -18,7 +20,7 @@ function readableDate(date: string): string {
 </script>
 
 <template>
-  <a class="card content-card" :href="url">
+  <a class="card content-card" :href="withBase(url)">
     <span v-if="exampleLabel" class="example-pill" data-example>{{ exampleLabel }}</span>
     <time :datetime="date">{{ readableDate(date) }}</time>
     <component :is="headingLevel === 2 ? 'h2' : 'h3'">{{ title }}</component>

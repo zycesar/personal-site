@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
+import { withBase } from 'vitepress'
 
 import { profile } from '../../../data/profile'
 import { data as allPosts } from '../../../posts/posts.data'
@@ -18,11 +19,11 @@ const posts = computed(() => allPosts.slice(0, 3))
         <h1 id="hero-title">我为 Web 构建 <em>好用的体验。</em></h1>
         <p class="hero-intro">{{ profile.intro }}</p>
         <div class="hero-actions">
-          <a class="button button-primary" href="/projects/">查看项目</a>
-          <a class="button button-secondary" href="/posts/">阅读文章</a>
+          <a class="button button-primary" :href="withBase('/projects/')">查看项目</a>
+          <a class="button button-secondary" :href="withBase('/posts/')">阅读文章</a>
         </div>
       </div>
-      <img class="brand-mark" :src="'/brand.svg'" width="320" height="320" alt="永字品牌图形">
+      <img class="brand-mark" :src="withBase('/brand.svg')" width="320" height="320" alt="永字品牌图形">
     </section>
 
     <section class="home-section shell" aria-labelledby="projects-title">
@@ -31,7 +32,7 @@ const posts = computed(() => allPosts.slice(0, 3))
           <p class="eyebrow">实践与探索</p>
           <h2 id="projects-title">精选项目</h2>
         </div>
-        <a href="/projects/">查看全部 <span aria-hidden="true">→</span></a>
+        <a :href="withBase('/projects/')">查看全部 <span aria-hidden="true">→</span></a>
       </div>
       <div class="project-grid">
         <ContentCard
@@ -54,7 +55,7 @@ const posts = computed(() => allPosts.slice(0, 3))
           <p class="eyebrow">思考与记录</p>
           <h2 id="posts-title">最新文章</h2>
         </div>
-        <a href="/posts/">浏览文章 <span aria-hidden="true">→</span></a>
+        <a :href="withBase('/posts/')">浏览文章 <span aria-hidden="true">→</span></a>
       </div>
       <div class="post-grid">
         <ContentCard

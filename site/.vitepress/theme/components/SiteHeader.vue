@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import { withBase } from 'vitepress'
 
 import ThemeToggle from './ThemeToggle.vue'
 
@@ -13,7 +14,7 @@ const links = [
 
 <template>
   <header>
-    <a href="/" aria-label="王永忠首页">WYZ.</a>
+    <a :href="withBase('/')" aria-label="王永忠首页">WYZ.</a>
 
     <button
       type="button"
@@ -29,7 +30,7 @@ const links = [
       <a
         v-for="link in links"
         :key="link.href"
-        :href="link.href"
+        :href="withBase(link.href)"
         @click="open = false"
       >
         {{ link.label }}

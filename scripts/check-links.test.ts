@@ -21,7 +21,7 @@ interface LinkCheckResult {
 }
 
 const { checkBuiltLinks } = checkerModule as unknown as {
-  checkBuiltLinks: (distDir: string) => Promise<LinkCheckResult>
+  checkBuiltLinks: (distDir: string, options?: { basePath?: string }) => Promise<LinkCheckResult>
 }
 
 describe('built link checker', () => {
@@ -81,6 +81,20 @@ describe('built link checker', () => {
 
     expect(result.checkedLinks).toBe(2)
     expect(result.failures.map(({ href }) => href)).toEqual(['/files/missing.pdf'])
+  })
+
+  it('maps repository-prefixed links back to the build root', async () => {
+    await write('index.html', [
+      '<a href="/personal-site/about">about</a>',
+      '<link href="/personal-site/assets/site.css">',
+    ].join('\n'))
+    await write('about.html')
+    await write('assets/site.css', 'body {}')
+
+    await expect(checkBuiltLinks(distDir, { basePath: '/personal-site/' })).resolves.toMatchObject({
+      checkedLinks: 2,
+      failures: [],
+    })
   })
 
   it('rejects encoded and bare traversal including Windows backslashes', async () => {

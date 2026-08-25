@@ -26,6 +26,7 @@ const mockedPosts = vi.hoisted(() => [
 vi.mock('../../../data/profile', () => ({ profile: mockedProfile }))
 vi.mock('../../../projects/projects.data', () => ({ data: mockedProjects }))
 vi.mock('../../../posts/posts.data', () => ({ data: mockedPosts }))
+vi.mock('vitepress', () => ({ withBase: (path: string) => `/personal-site${path}` }))
 
 import HomePage from './HomePage.vue'
 import NotFound from './NotFound.vue'
@@ -45,16 +46,16 @@ describe('HomePage', () => {
     const headings = wrapper.findAll('h2').map((heading) => heading.text())
     expect(headings).toEqual(['精选项目', '最新文章', '不只展示结果，也记录成长过程。'])
     expect(wrapper.get('.journey .eyebrow').text()).toBe('成长路径')
-    expect(wrapper.get('img[alt="永字品牌图形"]')).toBeTruthy()
+    expect(wrapper.get('img[alt="永字品牌图形"]').attributes('src')).toBe('/personal-site/brand.svg')
 
     const projectCards = wrapper.findAll('.project-card')
     expect(projectCards.map((card) => card.get('h3').text())).toEqual(['精选项目一', '精选项目二'])
-    expect(projectCards.map((card) => card.attributes('href'))).toEqual(['/projects/first', '/projects/second'])
+    expect(projectCards.map((card) => card.attributes('href'))).toEqual(['/personal-site/projects/first', '/personal-site/projects/second'])
     expect(projectCards.map((card) => card.get('[data-example]').text())).toEqual(['项目样例一', '项目样例二'])
 
     const postCards = wrapper.findAll('.post-card')
     expect(postCards.map((card) => card.get('h3').text())).toEqual(['最新文章', '第二篇文章', '第三篇文章'])
-    expect(postCards.map((card) => card.attributes('href'))).toEqual(['/posts/newest', '/posts/second', '/posts/third'])
+    expect(postCards.map((card) => card.attributes('href'))).toEqual(['/personal-site/posts/newest', '/personal-site/posts/second', '/personal-site/posts/third'])
     expect(wrapper.text()).not.toContain('非精选项目')
     expect(wrapper.text()).not.toContain('第四篇文章')
   })
@@ -79,6 +80,6 @@ describe('NotFound', () => {
 
     expect(wrapper.get('h1').text()).toBe('这个页面不存在')
     expect(wrapper.get('a').text()).toBe('返回首页')
-    expect(wrapper.get('a').attributes('href')).toBe('/')
+    expect(wrapper.get('a').attributes('href')).toBe('/personal-site/')
   })
 })
