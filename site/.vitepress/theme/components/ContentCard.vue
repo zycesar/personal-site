@@ -1,12 +1,15 @@
 <script setup lang="ts">
-defineProps<{
+withDefaults(defineProps<{
   url: string
   title: string
   description: string
   date: string
   tags: string[]
   exampleLabel?: string
-}>()
+  headingLevel?: 2 | 3
+}>(), {
+  headingLevel: 3,
+})
 
 function readableDate(date: string): string {
   const [year, month, day] = date.split('-').map(Number)
@@ -18,7 +21,7 @@ function readableDate(date: string): string {
   <a class="card content-card" :href="url">
     <span v-if="exampleLabel" class="example-pill" data-example>{{ exampleLabel }}</span>
     <time :datetime="date">{{ readableDate(date) }}</time>
-    <h3>{{ title }}</h3>
+    <component :is="headingLevel === 2 ? 'h2' : 'h3'">{{ title }}</component>
     <p>{{ description }}</p>
     <ul class="tag-list" aria-label="标签">
       <li v-for="tag in tags" :key="tag">{{ tag }}</li>
