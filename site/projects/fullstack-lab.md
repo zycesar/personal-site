@@ -1,7 +1,7 @@
 ---
 title: 全栈学习实验室
 description: 用于记录前端向服务端延伸的学习型项目结构样例。
-date: 2026-08-20
+date: '2026-08-20'
 tags: [Vue, Node.js, Database]
 featured: true
 draft: false

@@ -1,7 +1,7 @@
 ---
 title: 从前端走向全栈：我的能力地图
 description: 把服务端、数据与部署拆成可执行的学习路径。
-date: 2026-08-22
+date: '2026-08-22'
 category: 学习记录
 tags: [Node.js, Database, 部署]
 draft: false

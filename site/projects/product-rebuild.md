@@ -1,7 +1,7 @@
 ---
 title: 业务系统重构
 description: 用于演示项目案例写法的结构样例，不代表真实工作经历。
-date: 2026-08-25
+date: '2026-08-25'
 tags: [Vue, TypeScript, 工程化]
 featured: true
 draft: false

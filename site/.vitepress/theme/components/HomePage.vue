@@ -1,38 +1,13 @@
 <script setup lang="ts">
+import { computed } from 'vue'
+
 import { profile } from '../../../data/profile'
+import { data as allPosts } from '../../../posts/posts.data'
+import { data as allProjects } from '../../../projects/projects.data'
+import ContentCard from './ContentCard.vue'
 
-const projects = [
-  {
-    title: '业务系统重构',
-    description: '展示项目案例写法的结构样例。',
-    href: '/projects/product-rebuild',
-    tags: ['Vue', 'TypeScript'],
-  },
-  {
-    title: '全栈学习实验室',
-    description: '记录前端向服务端延伸的学习路径。',
-    href: '/projects/fullstack-lab',
-    tags: ['Node.js', 'Database'],
-  },
-]
-
-const posts = [
-  {
-    title: '从业务问题出发，而不是从技术方案出发',
-    description: '在选择框架和模式前，先把目标、约束与验证方式说清楚。',
-    href: '/posts/problem-before-technology',
-  },
-  {
-    title: '从前端走向全栈：我的能力地图',
-    description: '把服务端、数据与部署拆成可执行的学习路径。',
-    href: '/posts/fullstack-roadmap',
-  },
-  {
-    title: '构建可维护 Vue 组件时，我在关注什么',
-    description: '用清晰边界、稳定接口和可验证状态降低组件维护成本。',
-    href: '/posts/maintainable-vue-components',
-  },
-]
+const projects = computed(() => allProjects.filter(({ frontmatter }) => frontmatter.featured).slice(0, 2))
+const posts = computed(() => allPosts.slice(0, 3))
 </script>
 
 <template>
@@ -59,14 +34,17 @@ const posts = [
         <a href="/projects/">查看全部 <span aria-hidden="true">→</span></a>
       </div>
       <div class="project-grid">
-        <a v-for="project in projects" :key="project.href" class="card project-card" :href="project.href">
-          <span class="example-pill" data-example="project">示例项目</span>
-          <h3>{{ project.title }}</h3>
-          <p>{{ project.description }}</p>
-          <ul class="tag-list" aria-label="技术标签">
-            <li v-for="tag in project.tags" :key="tag">{{ tag }}</li>
-          </ul>
-        </a>
+        <ContentCard
+          v-for="project in projects"
+          :key="project.url"
+          class="project-card"
+          :url="project.url"
+          :title="project.frontmatter.title"
+          :description="project.frontmatter.description"
+          :date="project.frontmatter.date"
+          :tags="project.frontmatter.tags"
+          :example-label="project.frontmatter.exampleLabel"
+        />
       </div>
     </section>
 
@@ -79,12 +57,16 @@ const posts = [
         <a href="/posts/">浏览文章 <span aria-hidden="true">→</span></a>
       </div>
       <div class="post-grid">
-        <a v-for="post in posts" :key="post.href" class="card post-card" :href="post.href">
-          <span class="example-pill" data-example="post">示例文章</span>
-          <h3>{{ post.title }}</h3>
-          <p>{{ post.description }}</p>
-          <span class="read-more">阅读文章 <span aria-hidden="true">→</span></span>
-        </a>
+        <ContentCard
+          v-for="post in posts"
+          :key="post.url"
+          class="post-card"
+          :url="post.url"
+          :title="post.frontmatter.title"
+          :description="post.frontmatter.description"
+          :date="post.frontmatter.date"
+          :tags="post.frontmatter.tags"
+        />
       </div>
     </section>
 

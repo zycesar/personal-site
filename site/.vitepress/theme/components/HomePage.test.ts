@@ -10,7 +10,22 @@ const mockedProfile = vi.hoisted(() => ({
   links: [] as Array<{ label: string; href: string }>,
 }))
 
+const mockedProjects = vi.hoisted(() => [
+  { url: '/projects/first', frontmatter: { title: '精选项目一', description: '项目一描述', date: '2026-08-25', tags: ['Vue'], featured: true, draft: false, example: true, exampleLabel: '项目样例一' } },
+  { url: '/projects/second', frontmatter: { title: '精选项目二', description: '项目二描述', date: '2026-08-24', tags: ['TypeScript'], featured: true, draft: false, example: true, exampleLabel: '项目样例二' } },
+  { url: '/projects/unfeatured', frontmatter: { title: '非精选项目', description: '不应出现', date: '2026-08-26', tags: ['Node.js'], featured: false, draft: false, example: false } },
+])
+
+const mockedPosts = vi.hoisted(() => [
+  { url: '/posts/newest', frontmatter: { title: '最新文章', description: '最新描述', date: '2026-08-25', tags: ['一'], category: '测试', draft: false } },
+  { url: '/posts/second', frontmatter: { title: '第二篇文章', description: '第二篇描述', date: '2026-08-24', tags: ['二'], category: '测试', draft: false } },
+  { url: '/posts/third', frontmatter: { title: '第三篇文章', description: '第三篇描述', date: '2026-08-23', tags: ['三'], category: '测试', draft: false } },
+  { url: '/posts/fourth', frontmatter: { title: '第四篇文章', description: '不应出现', date: '2026-08-22', tags: ['四'], category: '测试', draft: false } },
+])
+
 vi.mock('../../../data/profile', () => ({ profile: mockedProfile }))
+vi.mock('../../../projects/projects.data', () => ({ data: mockedProjects }))
+vi.mock('../../../posts/posts.data', () => ({ data: mockedPosts }))
 
 import HomePage from './HomePage.vue'
 import NotFound from './NotFound.vue'
@@ -22,7 +37,7 @@ beforeEach(() => {
 })
 
 describe('HomePage', () => {
-  it('renders the portfolio sections and clearly labels example content', () => {
+  it('renders loader-derived featured projects and the three newest posts in order', () => {
     const wrapper = mount(HomePage)
 
     expect(wrapper.get('.hero .eyebrow').text()).toBe('HELLO，我是测试姓名')
@@ -30,15 +45,18 @@ describe('HomePage', () => {
     const headings = wrapper.findAll('h2').map((heading) => heading.text())
     expect(headings).toEqual(['精选项目', '最新文章', '不只展示结果，也记录成长过程。'])
     expect(wrapper.get('.journey .eyebrow').text()).toBe('成长路径')
-    expect(wrapper.findAll('[data-example="project"]').filter((label) => label.isVisible())).toHaveLength(2)
-    expect(wrapper.findAll('[data-example="post"]').filter((label) => label.isVisible())).toHaveLength(3)
     expect(wrapper.get('img[alt="永字品牌图形"]')).toBeTruthy()
 
     const projectCards = wrapper.findAll('.project-card')
-    expect(projectCards[0].text()).toContain('展示项目案例写法的结构样例。')
-    expect(projectCards[0].findAll('.tag-list li').map((tag) => tag.text())).toEqual(['Vue', 'TypeScript'])
-    expect(projectCards[1].text()).toContain('记录前端向服务端延伸的学习路径。')
-    expect(projectCards[1].findAll('.tag-list li').map((tag) => tag.text())).toEqual(['Node.js', 'Database'])
+    expect(projectCards.map((card) => card.get('h3').text())).toEqual(['精选项目一', '精选项目二'])
+    expect(projectCards.map((card) => card.attributes('href'))).toEqual(['/projects/first', '/projects/second'])
+    expect(projectCards.map((card) => card.get('[data-example]').text())).toEqual(['项目样例一', '项目样例二'])
+
+    const postCards = wrapper.findAll('.post-card')
+    expect(postCards.map((card) => card.get('h3').text())).toEqual(['最新文章', '第二篇文章', '第三篇文章'])
+    expect(postCards.map((card) => card.attributes('href'))).toEqual(['/posts/newest', '/posts/second', '/posts/third'])
+    expect(wrapper.text()).not.toContain('非精选项目')
+    expect(wrapper.text()).not.toContain('第四篇文章')
   })
 
   it('does not render contact content when no profile links are configured', () => {

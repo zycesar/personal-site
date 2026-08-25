@@ -1,7 +1,7 @@
 ---
 title: 构建可维护 Vue 组件时，我在关注什么
 description: 用清晰边界、稳定接口和可验证状态降低组件维护成本。
-date: 2026-08-18
+date: '2026-08-18'
 category: Vue
 tags: [Vue, TypeScript, 组件设计]
 draft: false
