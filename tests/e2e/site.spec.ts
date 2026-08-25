@@ -3,6 +3,13 @@ import { expect, type Page, test } from '@playwright/test'
 const mobileMenu = (page: Page) => page.locator('button[aria-controls="primary-navigation"]')
 const primaryNavigation = (page: Page) => page.locator('nav[aria-label="主导航"]')
 
+async function expectNoHorizontalOverflow(page: Page): Promise<void> {
+  const hasNoHorizontalOverflow = await page.evaluate(
+    () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
+  )
+  expect(hasNoHorizontalOverflow).toBe(true)
+}
+
 async function openMobileMenuIfVisible(page: Page): Promise<boolean> {
   const button = mobileMenu(page)
   if (!await button.isVisible()) return false
@@ -24,6 +31,7 @@ async function navigateFromHome(page: Page, label: string, path: RegExp): Promis
   await expect(link).toBeVisible()
   await link.click()
   await expect(page).toHaveURL(path)
+  await expectNoHorizontalOverflow(page)
 
   if (usedMobileMenu) {
     await expect(primaryNavigation(page)).toHaveAttribute('data-open', 'false')
@@ -33,10 +41,7 @@ async function navigateFromHome(page: Page, label: string, path: RegExp): Promis
 test('covers the critical visitor journey', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByRole('heading', { level: 1 })).toContainText('好用的体验')
-  const hasNoHorizontalOverflow = await page.evaluate(
-    () => document.documentElement.scrollWidth <= document.documentElement.clientWidth,
-  )
-  expect(hasNoHorizontalOverflow).toBe(true)
+  await expectNoHorizontalOverflow(page)
 
   await navigateFromHome(page, '项目', /\/projects\/$/)
   await navigateFromHome(page, '文章', /\/posts\/$/)
@@ -44,6 +49,7 @@ test('covers the critical visitor journey', async ({ page }) => {
 
   await page.goto('/projects/')
   await expect(page.getByRole('heading', { level: 1, name: '项目' })).toBeVisible()
+  await expectNoHorizontalOverflow(page)
   await expect(page.locator('[data-example]', { hasText: '示例项目' })).toHaveCount(2)
   const projectCards = page.locator('a.project-card')
   await expect(projectCards).toHaveCount(2)
@@ -54,12 +60,15 @@ test('covers the critical visitor journey', async ({ page }) => {
   await firstProject.click()
   await expect(page).toHaveURL(new RegExp(`${projectPath?.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`))
   await expect(page.getByRole('heading', { level: 1 })).toContainText(projectTitle)
+  await expectNoHorizontalOverflow(page)
   await page.reload()
   await expect(page.getByRole('heading', { level: 1 })).toContainText(projectTitle)
+  await expectNoHorizontalOverflow(page)
   await expect(page.getByRole('heading', { name: '这个页面不存在' })).toHaveCount(0)
 
   await page.goto('/posts/')
   await expect(page.getByRole('heading', { level: 1, name: '文章' })).toBeVisible()
+  await expectNoHorizontalOverflow(page)
   const articleCards = page.locator('a.post-card')
   await expect(articleCards).toHaveCount(3)
   const firstArticle = articleCards.first()
@@ -69,8 +78,10 @@ test('covers the critical visitor journey', async ({ page }) => {
   await firstArticle.click()
   await expect(page).toHaveURL(new RegExp(`${articlePath?.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`))
   await expect(page.getByRole('heading', { level: 1 })).toContainText(articleTitle)
+  await expectNoHorizontalOverflow(page)
   await page.reload()
   await expect(page.getByRole('heading', { level: 1 })).toContainText(articleTitle)
+  await expectNoHorizontalOverflow(page)
   await expect(page.getByRole('heading', { name: '这个页面不存在' })).toHaveCount(0)
 })
 
@@ -105,7 +116,7 @@ test('hydrates cleanly from the system dark preference', async ({ page }) => {
   await expect(page.locator('html')).toHaveClass(/\bdark\b/)
   await expect(page.getByRole('button', { name: '切换到浅色模式' })).toBeVisible()
 
-  expect(consoleProblems.filter((message) => /hydration|mismatch/i.test(message))).toEqual([])
+  expect(consoleProblems).toEqual([])
   expect(pageErrors).toEqual([])
 })
 
@@ -122,7 +133,7 @@ test('disables card transitions when reduced motion is requested', async ({ page
 })
 
 test('mobile menu exposes links and closes after navigation', async ({ page }, testInfo) => {
-  test.skip(testInfo.project.name !== 'iPhone 13', 'Mobile-specific responsive behavior')
+  test.skip(testInfo.project.use.isMobile !== true, 'Mobile-specific responsive behavior')
 
   await page.goto('/')
   const navigation = primaryNavigation(page)

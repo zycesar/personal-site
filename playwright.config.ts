@@ -9,9 +9,9 @@ export default defineConfig({
     launchOptions: executablePath ? { executablePath } : undefined,
   },
   webServer: {
-    command: 'pnpm dev',
+    command: 'pnpm dev --strictPort',
     port: 5173,
-    reuseExistingServer: true,
+    reuseExistingServer: !process.env.CI,
   },
   projects: [
     {
