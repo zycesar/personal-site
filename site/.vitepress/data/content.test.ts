@@ -275,6 +275,7 @@ describe('draft source discovery', () => {
     try {
       await mkdir(join(siteRoot, 'posts'))
       await mkdir(join(siteRoot, 'projects'))
+      await mkdir(join(siteRoot, 'posts', 'series'))
       await writeFile(join(siteRoot, 'posts', 'index.md'), '---\ntitle: 文章\ndescription: 列表\n---\n')
       await writeFile(join(siteRoot, 'posts', 'published.md'), [
         '---', 'title: 已发布', 'description: 摘要', "date: '2026-08-25'",
@@ -284,9 +285,39 @@ describe('draft source discovery', () => {
         '---', 'title: 草稿项目', 'description: 摘要', "date: '2026-08-24'",
         'tags: []', 'draft: true', '---', '',
       ].join('\n'))
+      await writeFile(join(siteRoot, 'posts', 'series', 'draft.md'), [
+        '---', 'title: 嵌套草稿', 'description: 摘要', "date: '2026-08-23'",
+        'category: 工程', 'tags: []', 'draft: true', '---', '',
+      ].join('\n'))
+      await writeFile(join(siteRoot, 'projects', '中文草稿.md'), [
+        '---', 'title: Unicode 草稿', 'description: 摘要', "date: '2026-08-22'",
+        'tags: []', 'draft: true', '---', '',
+      ].join('\n'))
+
+      const drafts = await discoverDraftSourcePaths(siteRoot)
+      expect(drafts).toHaveLength(3)
+      expect(drafts).toEqual(expect.arrayContaining([
+        'posts/series/draft.md',
+        'projects/draft.md',
+        'projects/中文草稿.md',
+      ]))
+    } finally {
+      await rm(siteRoot, { recursive: true, force: true })
+    }
+  })
+
+  it('reports a nested malformed Markdown path from the filesystem', async () => {
+    const siteRoot = await mkdtemp(join(tmpdir(), 'draft-discovery-invalid-'))
+    try {
+      await mkdir(join(siteRoot, 'posts', 'series'), { recursive: true })
+      await mkdir(join(siteRoot, 'projects'))
+      await writeFile(join(siteRoot, 'posts', 'series', 'broken.md'), [
+        '---', 'title: 损坏嵌套文章', "date: '2026-08-25'",
+        'category: 工程', 'tags: []', 'draft: true', '---', '',
+      ].join('\n'))
 
       await expect(discoverDraftSourcePaths(siteRoot))
-        .resolves.toEqual(['projects/draft.md'])
+        .rejects.toThrow(/posts\/series\/broken\.md.*frontmatter/)
     } finally {
       await rm(siteRoot, { recursive: true, force: true })
     }

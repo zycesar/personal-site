@@ -39,6 +39,9 @@ importers:
       jsdom:
         specifier: latest
         version: 30.0.1
+      parse5:
+        specifier: ^8.0.1
+        version: 8.0.1
       typescript:
         specifier: 6.0.3
         version: 6.0.3

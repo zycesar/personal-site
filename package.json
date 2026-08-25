@@ -26,6 +26,7 @@
     "@vitejs/plugin-vue": "latest",
     "@vue/test-utils": "latest",
     "jsdom": "latest",
+    "parse5": "^8.0.1",
     "typescript": "6.0.3",
     "vite": "latest",
     "vitest": "latest",
