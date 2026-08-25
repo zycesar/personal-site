@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { enableAutoUnmount, mount } from '@vue/test-utils'
+import { enableAutoUnmount, mount, renderToString } from '@vue/test-utils'
 import { nextTick, type Ref } from 'vue'
 
 import SiteHeader from './SiteHeader.vue'
@@ -58,9 +58,22 @@ describe('SiteHeader', () => {
 })
 
 describe('ThemeToggle', () => {
+  it('renders invariant markup before hydration regardless of appearance', async () => {
+    appearance.value = false
+    const lightHtml = await renderToString(ThemeToggle)
+
+    appearance.value = true
+    const darkHtml = await renderToString(ThemeToggle)
+
+    expect(lightHtml).toBe(darkHtml)
+    expect(darkHtml).toContain('aria-label="切换颜色模式"')
+    expect(darkHtml).toContain('<span aria-hidden="true">◐</span>')
+  })
+
   it('toggles the VitePress appearance state', async () => {
     const wrapper = mount(ThemeToggle)
     const button = wrapper.get('button')
+    await nextTick()
 
     expect(button.attributes('aria-label')).toBe('切换到深色模式')
 
@@ -73,6 +86,7 @@ describe('ThemeToggle', () => {
   it('reacts to external VitePress appearance changes', async () => {
     const wrapper = mount(ThemeToggle)
     const button = wrapper.get('button')
+    await nextTick()
 
     expect(button.attributes('aria-label')).toBe('切换到深色模式')
 
