@@ -339,13 +339,6 @@ body > #app > header > button[aria-controls="primary-navigation"] {
   list-style: none;
 }
 
-.journey-lead {
-  max-width: 520px;
-  margin: 20px 0 0;
-  color: var(--muted);
-  font-size: 1.06rem;
-}
-
 .journey li {
   display: grid;
   grid-template-columns: 48px 1fr;

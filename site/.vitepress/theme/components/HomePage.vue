@@ -4,15 +4,15 @@ import { profile } from '../../../data/profile'
 const projects = [
   {
     title: '业务系统重构',
-    description: '用于演示项目案例写法的结构样例，不代表真实工作经历。',
+    description: '展示项目案例写法的结构样例。',
     href: '/projects/product-rebuild',
-    tags: ['Vue', 'TypeScript', '工程化'],
+    tags: ['Vue', 'TypeScript'],
   },
   {
     title: '全栈学习实验室',
-    description: '用于记录前端向服务端延伸的学习型项目结构样例。',
+    description: '记录前端向服务端延伸的学习路径。',
     href: '/projects/fullstack-lab',
-    tags: ['Vue', 'Node.js', 'Database'],
+    tags: ['Node.js', 'Database'],
   },
 ]
 
@@ -39,7 +39,7 @@ const posts = [
   <div class="home-page">
     <section class="hero shell" aria-labelledby="hero-title">
       <div class="hero-copy">
-        <p class="eyebrow">HELLO，我是王永忠</p>
+        <p class="eyebrow">HELLO，我是{{ profile.name }}</p>
         <h1 id="hero-title">我为 Web 构建 <em>好用的体验。</em></h1>
         <p class="hero-intro">{{ profile.intro }}</p>
         <div class="hero-actions">
@@ -90,9 +90,8 @@ const posts = [
 
     <section class="journey home-section shell" aria-labelledby="journey-title">
       <div>
-        <p class="eyebrow">持续学习</p>
-        <h2 id="journey-title">成长路径</h2>
-        <p class="journey-lead">不只展示结果，也记录成长过程。</p>
+        <p class="eyebrow">成长路径</p>
+        <h2 id="journey-title">不只展示结果，<br>也记录成长过程。</h2>
       </div>
       <ol>
         <li v-for="(step, index) in profile.journey" :key="step">
@@ -103,7 +102,7 @@ const posts = [
     </section>
 
     <section v-if="profile.links.length" class="contact home-section shell" aria-labelledby="contact-title">
-      <h2 id="contact-title">一起聊聊</h2>
+      <h2 id="contact-title">一起聊聊。</h2>
       <div>
         <a v-for="link in profile.links" :key="link.href" :href="link.href" target="_blank" rel="noreferrer">
           {{ link.label }}
