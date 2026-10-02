@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="description" content="坦克大战在线试玩，支持键盘、鼠标与触摸操作。">
+    <title>坦克大战 · 王永忠的互动实验室</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <div class="hud" data-hud-root hidden>
+      <div><span>分数</span><strong data-hud="score">0</strong></div>
+      <div><span>本机最高分</span><strong data-hud="high-score">0</strong></div>
+      <div><span>波次</span><strong data-hud="wave">第一波</strong></div>
+    </div>
+    <main class="game-overlay" data-overlay>
+      <div class="intro">
+        <p class="eyebrow">CANVAS EXPERIMENT / 01</p>
+        <h1 data-title>坦克大战</h1>
+        <p data-description>自动开火，专注走位。看看你能抵御多少波敌人。</p>
+        <div class="instructions" data-instructions>
+          <p>电脑：方向键移动，或按住坦克拖动。</p>
+          <p>手机：按住坦克，用手指拖动。</p>
+          <p>拾取护盾、弹速、多发与射速强化，挑战 13 波敌人。</p>
+        </div>
+        <button type="button" class="primary" data-play>开始游戏</button>
+        <p class="status" role="status" data-status></p>
+        <p class="credit">玩法与素材来源：<a href="https://www.wwenj.com/" target="_blank" rel="noreferrer">wwenj.com</a></p>
+      </div>
+    </main>
+    <nav class="game-controls" aria-label="游戏控制">
+      <button type="button" data-pause hidden>暂停</button>
+      <button type="button" data-restart hidden>重新开始</button>
+      <button type="button" data-fullscreen hidden>全屏</button>
+      <button type="button" data-exit>退出游戏</button>
+    </nav>
+    <script type="module" src="src/main.js"></script>
+  </body>
+</html>

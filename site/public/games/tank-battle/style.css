@@ -1,0 +1,86 @@
+:root {
+  color-scheme: dark;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+  background: #0c111b;
+  color: #ecf6ff;
+}
+
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; }
+body {
+  background-image: radial-gradient(ellipse at 30% 10%, #5b5ce226, transparent 60%), linear-gradient(#74d2ff0b 1px, transparent 1px), linear-gradient(90deg, #74d2ff0b 1px, transparent 1px);
+  background-size: 100% 100%, 40px 40px, 40px 40px;
+  touch-action: none;
+}
+button, a { -webkit-tap-highlight-color: transparent; }
+button {
+  min-height: 44px;
+  padding: 10px 18px;
+  border: 1px solid #59687e;
+  border-radius: 10px;
+  background: #172131;
+  color: #eef6ff;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 650;
+  cursor: pointer;
+}
+button:hover { border-color: #9b9cff; background: #242d45; }
+button:disabled { cursor: wait; opacity: .65; }
+button:focus-visible, a:focus-visible { outline: 3px solid #a9aaff; outline-offset: 4px; }
+a { color: #b7b8ff; text-underline-offset: 3px; }
+.hud {
+  position: fixed;
+  z-index: 2;
+  top: max(16px, env(safe-area-inset-top));
+  left: 16px;
+  display: flex;
+  gap: 24px;
+  padding: 12px 18px;
+  border: 1px solid #435c76;
+  border-radius: 12px;
+  background: #0c111be8;
+  pointer-events: none;
+}
+.hud span { display: block; color: #9cb2cc; font-size: 11px; margin-bottom: 5px; }
+.hud strong { color: #a9f5ec; font-size: 19px; font-variant-numeric: tabular-nums; }
+.hud [data-hud="high-score"] { color: #f8d78c; }
+.game-overlay {
+  position: fixed;
+  z-index: 3;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: auto;
+  padding: 40px 24px 100px;
+  background: #0c111bef;
+  text-align: center;
+  touch-action: pan-y;
+}
+.intro { max-width: 540px; }
+.eyebrow { color: #999cff; font-size: 11px; font-weight: 750; letter-spacing: .15em; }
+h1 { margin: 16px 0; font-size: clamp(28px, 6vw, 48px); letter-spacing: -.04em; }
+p { color: #b0c1d5; font-size: 14px; line-height: 1.75; }
+.instructions { margin: 24px 0; }
+.instructions p { margin: 6px 0; }
+.primary { margin-top: 12px; padding-inline: 32px; background: #6768e8; border-color: #9293ff; }
+.credit { margin: 22px 0 0; font-size: 11px; color: #8fa2bd; }
+.status { min-height: 1.6em; margin: 10px 0 0; color: #f8d78c; }
+.game-controls {
+  position: fixed;
+  z-index: 4;
+  right: max(14px, env(safe-area-inset-right));
+  bottom: max(14px, env(safe-area-inset-bottom));
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: end;
+  max-width: calc(100% - 28px);
+}
+@media (max-width: 480px) {
+  .hud { left: 12px; top: 12px; gap: 18px; padding: 10px 14px; }
+  .hud strong { font-size: 16px; }
+  .game-controls { right: 12px; bottom: max(12px, env(safe-area-inset-bottom)); gap: 6px; }
+  .game-controls button { padding: 10px 12px; font-size: 12px; }
+}

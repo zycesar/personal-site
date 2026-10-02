@@ -41,7 +41,7 @@ describe('Layout', () => {
 
   it('renders the custom not-found view from VitePress page data', () => {
     layoutState.page.isNotFound = true
-    const wrapper = mount(Layout)
+    const wrapper = mount(Layout, { global: { stubs: { Content: { template: '<div>Markdown content</div>' } } } })
 
     expect(wrapper.get('h1').text()).toBe('这个页面不存在')
     expect(wrapper.get('.not-found a[href="/personal-site/"]').text()).toBe('返回首页')
@@ -50,7 +50,7 @@ describe('Layout', () => {
   it.each(['projects', 'posts'] as const)('dispatches %s index pages to ContentList', (kind) => {
     layoutState.frontmatter.layout = kind
 
-    const wrapper = mount(Layout)
+    const wrapper = mount(Layout, { global: { stubs: { Content: { template: '<div>Markdown content</div>' } } } })
 
     expect(wrapper.get(`[data-list="${kind}"]`).exists()).toBe(true)
     expect(wrapper.text()).not.toContain('Markdown content')

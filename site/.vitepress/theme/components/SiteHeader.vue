@@ -8,6 +8,7 @@ const open = ref(false)
 const links = [
   { label: '项目', href: '/projects/' },
   { label: '文章', href: '/posts/' },
+  { label: '实验室', href: '/lab/' },
   { label: '关于', href: '/about' },
 ]
 </script>

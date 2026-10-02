@@ -6,6 +6,7 @@ import { profile } from '../../../data/profile'
 import { data as allPosts } from '../../../posts/posts.data'
 import { data as allProjects } from '../../../projects/projects.data'
 import ContentCard from './ContentCard.vue'
+import TankLabCard from './TankLabCard.vue'
 
 const projects = computed(() => allProjects.filter(({ frontmatter }) => frontmatter.featured).slice(0, 3))
 const posts = computed(() => allPosts.slice(0, 3))
@@ -70,6 +71,17 @@ const posts = computed(() => allPosts.slice(0, 3))
           :tags="post.frontmatter.tags"
         />
       </div>
+    </section>
+
+    <section class="home-section shell" aria-labelledby="lab-title">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">动手试一试</p>
+          <h2 id="lab-title">互动实验</h2>
+        </div>
+        <a :href="withBase('/lab/')">进入实验室 <span aria-hidden="true">→</span></a>
+      </div>
+      <TankLabCard />
     </section>
 
     <section class="journey home-section shell" aria-labelledby="journey-title">

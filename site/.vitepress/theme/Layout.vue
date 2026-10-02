@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Content, useData } from 'vitepress'
+import { useData } from 'vitepress'
 
 import HomePage from './components/HomePage.vue'
 import ContentList from './components/ContentList.vue'

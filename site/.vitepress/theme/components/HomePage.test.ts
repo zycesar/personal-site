@@ -49,7 +49,7 @@ describe('HomePage', () => {
     expect(wrapper.get('.hero-role').text()).toBe('前端开发者')
     expect(wrapper.findAll('.hero-actions a').map((link) => link.text())).toEqual(['阅读文章', '查看项目'])
     const headings = wrapper.findAll('h2').map((heading) => heading.text())
-    expect(headings).toEqual(['精选项目', '最新文章', '在实践中积累，在探索中深入。'])
+    expect(headings).toEqual(['精选项目', '最新文章', '互动实验', '在实践中积累，在探索中深入。'])
     expect(wrapper.get('.journey .eyebrow').text()).toBe('当前探索')
     expect(wrapper.findAll('.journey li strong').map((item) => item.text())).toEqual(mockedProfile.exploration)
     expect(wrapper.get('img[alt="永字品牌图形"]').attributes('src')).toBe('/personal-site/brand.svg')

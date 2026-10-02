@@ -8,7 +8,8 @@
     "build": "vitepress build site",
     "preview": "vitepress preview site",
     "typecheck": "vue-tsc --noEmit",
-    "test": "vitest run",
+    "test": "vitest run && pnpm test:game",
+    "test:game": "node tests/game/smoke.mjs",
     "test:e2e": "playwright test",
     "check:links": "node scripts/check-links.mjs",
     "check": "pnpm typecheck && pnpm test && pnpm build && pnpm check:links"
