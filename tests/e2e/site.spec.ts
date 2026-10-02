@@ -46,7 +46,12 @@ async function navigateFromHome(page: Page, label: string, path: RegExp): Promis
 
 test('covers the critical visitor journey', async ({ page }) => {
   await page.goto(sitePath())
-  await expect(page.getByRole('heading', { level: 1 })).toContainText('好用的体验')
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('构建可靠的应用')
+  await expect(page.locator('.hero-role')).toHaveText('前端工程师 · 全栈实践者')
+  await expect(page.locator('.hero-actions a').first()).toHaveText('阅读文章')
+  await expect(page.locator('.project-card')).toHaveCount(3)
+  await expect(page.locator('#posts-title')).toHaveCount(0)
+  await expect(page.locator('.journey .eyebrow')).toHaveText('当前探索')
   await expectNoHorizontalOverflow(page)
 
   await navigateFromHome(page, '项目', /\/projects\/$/)
@@ -56,9 +61,9 @@ test('covers the critical visitor journey', async ({ page }) => {
   await page.goto(sitePath('/projects/'))
   await expect(page.getByRole('heading', { level: 1, name: '项目' })).toBeVisible()
   await expectNoHorizontalOverflow(page)
-  await expect(page.locator('[data-example]', { hasText: '示例项目' })).toHaveCount(2)
+  await expect(page.locator('[data-example]')).toHaveCount(0)
   const projectCards = page.locator('a.project-card')
-  await expect(projectCards).toHaveCount(2)
+  await expect(projectCards).toHaveCount(3)
   const firstProject = projectCards.first()
   const projectTitle = await firstProject.getByRole('heading').innerText()
   const projectPath = await firstProject.getAttribute('href')
@@ -76,19 +81,31 @@ test('covers the critical visitor journey', async ({ page }) => {
   await expect(page.getByRole('heading', { level: 1, name: '文章' })).toBeVisible()
   await expectNoHorizontalOverflow(page)
   const articleCards = page.locator('a.post-card')
-  await expect(articleCards).toHaveCount(3)
-  const firstArticle = articleCards.first()
-  const articleTitle = await firstArticle.getByRole('heading').innerText()
-  const articlePath = await firstArticle.getAttribute('href')
-  expect(articlePath).toBeTruthy()
-  await firstArticle.click()
-  await expect(page).toHaveURL(new RegExp(`${articlePath?.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`))
-  await expect(page.getByRole('heading', { level: 1 })).toContainText(articleTitle)
-  await expectNoHorizontalOverflow(page)
+  await expect(articleCards).toHaveCount(0)
+  await expect(page.getByText('内容正在准备中。', { exact: true })).toBeVisible()
   await page.reload()
-  await expect(page.getByRole('heading', { level: 1 })).toContainText(articleTitle)
+  await expect(articleCards).toHaveCount(0)
   await expectNoHorizontalOverflow(page)
   await expect(page.getByRole('heading', { name: '这个页面不存在' })).toHaveCount(0)
+})
+
+test('opens every real case from the about page without exposing private content', async ({ page }) => {
+  const cases = [
+    { title: '爆卡营微信商城与管理后台', path: '/projects/baokaying' },
+    { title: '魔介表单系统', path: '/projects/low-code-forms' },
+    { title: '魔介 AI 智能助手 H5', path: '/projects/mobile-ai-assistant' },
+  ]
+
+  for (const project of cases) {
+    await page.goto(sitePath('/about'))
+    await page.getByRole('link', { name: project.title, exact: true }).click()
+    await expect(page).toHaveURL(new RegExp(`${project.path}$`))
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(project.title)
+    await expect(page.getByRole('heading', { level: 2, name: /^我的角色/ })).toBeVisible()
+    await expect(page.getByRole('heading', { level: 2, name: /^后续复盘方向/ })).toBeVisible()
+    await expect(page.locator('main')).not.toContainText(/1[3-9]\d{9}/)
+    await expectNoHorizontalOverflow(page)
+  }
 })
 
 test('persists an explicit dark theme and renders the custom 404', async ({ page }) => {
@@ -136,6 +153,18 @@ test('disables card transitions when reduced motion is requested', async ({ page
     duration.endsWith('ms') ? Number.parseFloat(duration) / 1000 : Number.parseFloat(duration)
 
   expect(Math.max(...transitionDurations.map(durationInSeconds))).toBeLessThanOrEqual(0.00001)
+})
+
+test('keeps the mobile hero readable without single-character wrapped lines', async ({ page }, testInfo) => {
+  test.skip(testInfo.project.use.isMobile !== true, 'Mobile-specific typography')
+
+  await page.goto(sitePath())
+  const title = page.getByRole('heading', { level: 1 })
+  const { height, lineHeight } = await title.evaluate((heading) => ({
+    height: heading.getBoundingClientRect().height,
+    lineHeight: Number.parseFloat(getComputedStyle(heading).lineHeight),
+  }))
+  expect(height).toBeLessThanOrEqual(lineHeight * 2.1)
 })
 
 test('mobile menu exposes links and closes after navigation', async ({ page }, testInfo) => {

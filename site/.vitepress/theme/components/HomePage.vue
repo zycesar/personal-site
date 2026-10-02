@@ -7,7 +7,7 @@ import { data as allPosts } from '../../../posts/posts.data'
 import { data as allProjects } from '../../../projects/projects.data'
 import ContentCard from './ContentCard.vue'
 
-const projects = computed(() => allProjects.filter(({ frontmatter }) => frontmatter.featured).slice(0, 2))
+const projects = computed(() => allProjects.filter(({ frontmatter }) => frontmatter.featured).slice(0, 3))
 const posts = computed(() => allPosts.slice(0, 3))
 </script>
 
@@ -16,11 +16,12 @@ const posts = computed(() => allPosts.slice(0, 3))
     <section class="hero shell" aria-labelledby="hero-title">
       <div class="hero-copy">
         <p class="eyebrow">HELLO，我是{{ profile.name }}</p>
-        <h1 id="hero-title">我为 Web 构建 <em>好用的体验。</em></h1>
+        <p class="hero-role">{{ profile.role }}</p>
+        <h1 id="hero-title">{{ profile.headline }} <em>{{ profile.emphasis }}</em></h1>
         <p class="hero-intro">{{ profile.intro }}</p>
         <div class="hero-actions">
-          <a class="button button-primary" :href="withBase('/projects/')">查看项目</a>
-          <a class="button button-secondary" :href="withBase('/posts/')">阅读文章</a>
+          <a class="button button-primary" :href="withBase('/posts/')">阅读文章</a>
+          <a class="button button-secondary" :href="withBase('/projects/')">查看项目</a>
         </div>
       </div>
       <img class="brand-mark" :src="withBase('/brand.svg')" width="320" height="320" alt="永字品牌图形">
@@ -49,7 +50,7 @@ const posts = computed(() => allPosts.slice(0, 3))
       </div>
     </section>
 
-    <section class="home-section shell" aria-labelledby="posts-title">
+    <section v-if="posts.length" class="home-section shell" aria-labelledby="posts-title">
       <div class="section-heading">
         <div>
           <p class="eyebrow">思考与记录</p>
@@ -73,11 +74,11 @@ const posts = computed(() => allPosts.slice(0, 3))
 
     <section class="journey home-section shell" aria-labelledby="journey-title">
       <div>
-        <p class="eyebrow">成长路径</p>
-        <h2 id="journey-title">不只展示结果，<br>也记录成长过程。</h2>
+        <p class="eyebrow">当前探索</p>
+        <h2 id="journey-title">在实践中积累，<br>在探索中深入。</h2>
       </div>
       <ol>
-        <li v-for="(step, index) in profile.journey" :key="step">
+        <li v-for="(step, index) in profile.exploration" :key="step">
           <span aria-hidden="true">{{ String(index + 1).padStart(2, '0') }}</span>
           <strong>{{ step }}</strong>
         </li>

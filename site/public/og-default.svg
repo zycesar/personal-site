@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
   <title id="title">王永忠个人站</title>
-  <desc id="desc">前端开发者，正在向全栈工程师成长</desc>
+  <desc id="desc">前端工程师 · 全栈实践者，分享复杂业务与应用交付经验</desc>
   <defs>
     <linearGradient id="background" x1="80" y1="20" x2="1120" y2="620" gradientUnits="userSpaceOnUse">
       <stop stop-color="#765fff"/>
@@ -12,5 +12,5 @@
   <circle cx="208" cy="190" r="104" fill="url(#background)"/>
   <text x="208" y="230" fill="#fff" font-family="sans-serif" font-size="106" font-weight="700" text-anchor="middle">永</text>
   <text x="96" y="404" fill="#fff" font-family="sans-serif" font-size="72" font-weight="700">王永忠</text>
-  <text x="100" y="488" fill="#b9b9c8" font-family="sans-serif" font-size="35">前端开发者，正在向全栈工程师成长</text>
+  <text x="100" y="488" fill="#b9b9c8" font-family="sans-serif" font-size="35">前端工程师 · 全栈实践者</text>
 </svg>

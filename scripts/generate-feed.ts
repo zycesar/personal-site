@@ -3,6 +3,7 @@ import { mkdir, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
 import { type ContentPage, parsePost, visibleByDate } from '../site/.vitepress/data/content'
+import { profile } from '../site/data/profile'
 
 export type FeedPost = ContentPage
 
@@ -98,7 +99,7 @@ export async function generateFeed(
   const url = new URL(normalizeSiteUrl(siteUrl))
   const feed = new Feed({
     title: '王永忠',
-    description: '前端开发者，正在向全栈工程师成长。',
+    description: profile.intro,
     id: url.href,
     link: url.href,
     language: 'zh-CN',

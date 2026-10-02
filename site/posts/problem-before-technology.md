@@ -4,7 +4,7 @@ description: 在选择框架和模式前，先把目标、约束与验证方式�
 date: '2026-08-25'
 category: 前端工程
 tags: [工程思维, 产品]
-draft: false
+draft: true
 ---
 
 # 从业务问题出发，而不是从技术方案出发

@@ -176,6 +176,13 @@ body > #app > header > button[aria-controls="primary-navigation"] {
   font-style: normal;
 }
 
+.hero-role {
+  margin: 0 0 20px;
+  color: var(--muted);
+  font-size: .95rem;
+  font-weight: 650;
+}
+
 .hero-intro {
   max-width: 650px;
   margin: 28px 0 0;
@@ -254,7 +261,7 @@ body > #app > header > button[aria-controls="primary-navigation"] {
 
 .project-grid {
   display: grid;
-  grid-template-columns: 1.35fr 1fr;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 20px;
 }
 
@@ -501,7 +508,7 @@ body > #app > header > button[aria-controls="primary-navigation"] {
   }
 
   .hero h1 {
-    font-size: clamp(2.7rem, 14vw, 4.8rem);
+    font-size: clamp(2rem, 10.5vw, 3.6rem);
   }
 
   .project-grid,

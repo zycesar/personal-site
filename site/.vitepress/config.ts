@@ -11,9 +11,10 @@ import {
   type FeedPost,
 } from '../../scripts/generate-feed'
 import { parsePost } from './data/content'
+import { profile } from '../data/profile'
 
 const SITE_TITLE = '王永忠'
-const SITE_DESCRIPTION = '前端开发者，正在向全栈工程师成长。'
+const SITE_DESCRIPTION = profile.intro
 const isProductionBuild = process.argv.some((argument) => argument === 'build')
 const configuredSiteUrl = process.env.VITE_SITE_URL
 
