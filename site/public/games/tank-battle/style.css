@@ -65,7 +65,6 @@ p { color: #b0c1d5; font-size: 14px; line-height: 1.75; }
 .instructions { margin: 24px 0; }
 .instructions p { margin: 6px 0; }
 .primary { margin-top: 12px; padding-inline: 32px; background: #6768e8; border-color: #9293ff; }
-.credit { margin: 22px 0 0; font-size: 11px; color: #8fa2bd; }
 .status { min-height: 1.6em; margin: 10px 0 0; color: #f8d78c; }
 .game-controls {
   position: fixed;
