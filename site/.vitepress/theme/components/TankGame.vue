@@ -36,11 +36,12 @@ async function startGame() {
   stage.value?.scrollIntoView({ block: 'center', behavior: 'instant' })
 }
 
-function handleMessage(event: MessageEvent) {
+async function handleMessage(event: MessageEvent) {
   if (event.origin !== window.location.origin || event.source !== frame.value?.contentWindow) return
   if (event.data?.type === 'tank-game:ready') {
     clearTimeout(loadingTimeout)
     state.value = 'playing'
+    await nextTick()
     frame.value?.focus({ preventScroll: true })
   } else if (event.data?.type === 'tank-game:exit') {
     void closeGame()
@@ -62,6 +63,7 @@ onBeforeUnmount(() => {
       <iframe
         v-if="state === 'loading' || state === 'playing'"
         ref="frame"
+        :class="{ 'is-ready': state === 'playing' }"
         :src="withBase('/games/tank-battle/index.html?autostart=1')"
         title="坦克大战游戏画面"
         allow="fullscreen"
@@ -99,7 +101,8 @@ onBeforeUnmount(() => {
   border-radius: 20px;
   background: #0c111b;
 }
-iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; visibility: hidden; }
+iframe.is-ready { visibility: visible; }
 .game-cover {
   position: absolute;
   inset: 0;
@@ -109,6 +112,7 @@ iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
   justify-content: center;
   gap: 20px;
   padding: 28px;
+  background-color: #0c111b;
   background-image: radial-gradient(ellipse at 50% 40%, #5b5ce238, transparent 70%), linear-gradient(#8d9dff0b 1px, transparent 1px), linear-gradient(90deg, #8d9dff0b 1px, transparent 1px);
   background-size: 100% 100%, 32px 32px, 32px 32px;
   text-align: center;

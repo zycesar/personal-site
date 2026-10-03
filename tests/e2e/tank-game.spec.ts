@@ -95,6 +95,31 @@ test('loads on demand and supports controls, score persistence and repeated sess
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true)
 })
 
+test('keeps the game hidden until first-load resources are ready', async ({ page }) => {
+  let releaseScript: () => void = () => {}
+  const delayedScript = new Promise<void>((resolve) => { releaseScript = resolve })
+  await page.route('**/games/tank-battle/src/main.js', async (route) => {
+    await delayedScript
+    await route.continue().catch(() => {})
+  })
+  try {
+    await page.goto(sitePath('/lab/tank-battle'))
+    await page.getByRole('button', { name: '开始体验', exact: true }).click()
+    await expect(page.frameLocator('iframe').locator('[data-title]')).toBeAttached()
+    await expect(page.locator('.game-cover [role="status"]')).toHaveText('正在加载游戏…')
+    await expect(page.locator('iframe')).toBeHidden()
+    const bounds = await page.locator('iframe').boundingBox()
+    expect(bounds?.width).toBeGreaterThan(0)
+    expect(bounds?.height).toBeGreaterThan(0)
+  } finally {
+    releaseScript()
+  }
+  await getGame(page)
+  await expect(page.locator('iframe')).toBeVisible()
+  await expect(page.locator('iframe')).toBeFocused()
+  await expect(page.locator('.game-cover')).toHaveCount(0)
+})
+
 test('can cancel loading without leaving a game behind', async ({ page }) => {
   let releaseScript: () => void = () => {}
   const delayedScript = new Promise<void>((resolve) => { releaseScript = resolve })
