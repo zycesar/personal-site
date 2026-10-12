@@ -15,7 +15,7 @@ const picks = computed(() => dailyPicks(props.dateIso))
 <template>
   <section class="english-board" aria-label="每日英语">
     <WordCard :word="picks.word" :read-only="!interactive" />
-    <SentenceCard :sentence="picks.sentence" />
+    <SentenceCard :sentence="picks.sentence" :read-only="!interactive" />
     <QuizCard :quiz="picks.quiz" :read-only="!interactive" />
     <CheckInCard v-if="interactive" :date-iso="dateIso" />
   </section>

@@ -44,14 +44,23 @@ describe('WordCard', () => {
   })
 
   it('shows the speech button after mount when speechSynthesis exists', async () => {
-    window.speechSynthesis = { cancel: vi.fn(), speak: vi.fn() } as unknown as SpeechSynthesis
+    window.speechSynthesis = {
+      cancel: vi.fn(),
+      resume: vi.fn(),
+      speak: vi.fn(),
+      getVoices: vi.fn(() => []),
+      addEventListener: vi.fn(),
+    } as unknown as SpeechSynthesis
     ;(window as unknown as { SpeechSynthesisUtterance?: unknown }).SpeechSynthesisUtterance =
       class { constructor(public text?: string) {} }
+    vi.useFakeTimers()
     const wrapper = mount(WordCard, { props: { word } })
     await wrapper.vm.$nextTick()
     const button = wrapper.get('button[aria-label="播放单词发音"]')
     await button.trigger('click')
+    vi.advanceTimersByTime(120)
     expect(window.speechSynthesis.speak).toHaveBeenCalledTimes(1)
+    vi.useRealTimers()
   })
 
   it('persists the latest familiar-level mark', async () => {

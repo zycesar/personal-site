@@ -1,17 +1,12 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-
 import type { WordEntry } from '../../../english/schema'
 import { useEnglishProgress, type WordMarkLevel } from './useEnglishProgress'
+import { useEnglishSpeech } from './useEnglishSpeech'
 
 const props = withDefaults(defineProps<{ word: WordEntry, readOnly?: boolean }>(), { readOnly: false })
 
 const { progress, markWord } = useEnglishProgress()
-const speechAvailable = ref(false)
-
-onMounted(() => {
-  speechAvailable.value = typeof window !== 'undefined' && 'speechSynthesis' in window
-})
+const { available: speechAvailable, speak } = useEnglishSpeech()
 
 const markOptions: Array<{ level: WordMarkLevel, label: string }> = [
   { level: 'known', label: '认识' },
@@ -21,15 +16,6 @@ const markOptions: Array<{ level: WordMarkLevel, label: string }> = [
 
 function currentLevel(level: WordMarkLevel): boolean {
   return progress.value.wordMarks[props.word.id]?.level === level
-}
-
-function speak(): void {
-  if (!speechAvailable.value || typeof window === 'undefined') return
-  const utterance = new SpeechSynthesisUtterance(props.word.word)
-  utterance.lang = 'en-US'
-  utterance.rate = 0.9
-  window.speechSynthesis.cancel()
-  window.speechSynthesis.speak(utterance)
 }
 </script>
 
@@ -45,7 +31,7 @@ function speak(): void {
     <p class="word-card-example-en">{{ word.exampleEn }}</p>
     <p class="word-card-example-zh">{{ word.exampleZh }}</p>
     <div v-if="!readOnly" class="word-card-actions">
-      <button type="button" class="speak-button" aria-label="播放单词发音" @click="speak">🔊 发音</button>
+      <button type="button" class="speak-button" aria-label="播放单词发音" @click="speak(word.word)">🔊 发音</button>
       <span class="word-card-marks" role="group" aria-label="标记熟悉度">
         <button
           v-for="option in markOptions"

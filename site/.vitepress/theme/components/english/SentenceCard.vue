@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import type { SentenceEntry } from '../../../english/schema'
+import { useEnglishSpeech } from './useEnglishSpeech'
 
-defineProps<{ sentence: SentenceEntry }>()
+withDefaults(defineProps<{ sentence: SentenceEntry, readOnly?: boolean }>(), { readOnly: false })
+
+const { available: speechAvailable, speak } = useEnglishSpeech()
 </script>
 
 <template>
@@ -16,6 +19,9 @@ defineProps<{ sentence: SentenceEntry }>()
       </ul>
     </div>
     <p v-if="sentence.source" class="sentence-card-source">—— {{ sentence.source }}</p>
+    <div v-if="!readOnly && speechAvailable" class="sentence-card-actions">
+      <button type="button" class="speak-button" aria-label="播放句子发音" @click="speak(sentence.en)">🔊 发音</button>
+    </div>
   </article>
 </template>
 
@@ -29,4 +35,10 @@ defineProps<{ sentence: SentenceEntry }>()
 .sentence-card-notes ul { margin: 6px 0 0; padding-left: 18px; color: var(--muted); }
 .sentence-card-notes li { margin: 2px 0; }
 .sentence-card-source { margin: 12px 0 0; color: var(--muted); font-size: 14px; text-align: right; }
+.sentence-card-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 16px; }
+.sentence-card-actions button { padding: 6px 14px; border: 1px solid var(--border); border-radius: 999px; background: transparent; color: var(--text); cursor: pointer; }
+.sentence-card-actions button:hover { border-color: var(--accent); }
+@media (prefers-reduced-motion: reduce) {
+  .sentence-card-actions button { transition: none; }
+}
 </style>
