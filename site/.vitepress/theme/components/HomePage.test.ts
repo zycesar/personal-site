@@ -29,6 +29,7 @@ const mockedPosts = vi.hoisted(() => [
 vi.mock('../../../data/profile', () => ({ profile: mockedProfile }))
 vi.mock('../../../projects/projects.data', () => ({ data: mockedProjects }))
 vi.mock('../../../posts/posts.data', () => ({ data: mockedPosts }))
+vi.mock('../../../english/today.data', () => ({ data: '2026-10-12' }))
 vi.mock('vitepress', () => ({ withBase: (path: string) => `/personal-site${path}` }))
 
 import HomePage from './HomePage.vue'
@@ -49,7 +50,7 @@ describe('HomePage', () => {
     expect(wrapper.get('.hero-role').text()).toBe('前端开发者')
     expect(wrapper.findAll('.hero-actions a').map((link) => link.text())).toEqual(['阅读文章', '查看项目'])
     const headings = wrapper.findAll('h2').map((heading) => heading.text())
-    expect(headings).toEqual(['精选项目', '最新文章', '互动实验', '在实践中积累，在探索中深入。'])
+    expect(headings).toEqual(['精选项目', '最新文章', '今日一词', '互动实验', '在实践中积累，在探索中深入。'])
     expect(wrapper.get('.journey .eyebrow').text()).toBe('当前探索')
     expect(wrapper.findAll('.journey li strong').map((item) => item.text())).toEqual(mockedProfile.exploration)
     expect(wrapper.get('img[alt="永字品牌图形"]').attributes('src')).toBe('/personal-site/brand.svg')
@@ -64,6 +65,11 @@ describe('HomePage', () => {
     expect(postCards.map((card) => card.attributes('href'))).toEqual(['/personal-site/posts/newest', '/personal-site/posts/second', '/personal-site/posts/third'])
     expect(wrapper.text()).not.toContain('非精选项目')
     expect(wrapper.text()).not.toContain('第四篇文章')
+
+    const englishSection = wrapper.get('.english-section')
+    expect(englishSection.get('a[href="/personal-site/english/"]').exists()).toBe(true)
+    expect(englishSection.text()).toContain('今日一词')
+    expect(englishSection.text()).toContain('2026-10-12')
   })
 
   it('does not render contact content when no profile links are configured', () => {

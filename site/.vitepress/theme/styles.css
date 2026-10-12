@@ -271,6 +271,47 @@ body > #app > header > button[aria-controls="primary-navigation"] {
   gap: 20px;
 }
 
+.english-home-card {
+  padding: clamp(24px, 3vw, 38px);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+}
+
+.english-teaser-date {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.english-teaser-term {
+  margin: 8px 0 0;
+  font-size: 26px;
+}
+
+.english-teaser-phonetic {
+  margin-left: 10px;
+  color: var(--muted);
+  font-size: 15px;
+  font-weight: 400;
+}
+
+.english-teaser-meaning {
+  margin: 4px 0 0;
+}
+
+.english-teaser-example {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.english-teaser-streak {
+  margin: 12px 0 0;
+  color: var(--accent);
+  font-weight: 700;
+}
+
 .card {
   display: flex;
   min-width: 0;

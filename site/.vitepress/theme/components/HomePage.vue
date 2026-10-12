@@ -1,15 +1,25 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { withBase } from 'vitepress'
 
 import { profile } from '../../../data/profile'
 import { data as allPosts } from '../../../posts/posts.data'
 import { data as allProjects } from '../../../projects/projects.data'
+import { data as today } from '../../../english/today.data'
+import { dailyPicks } from '../../../.vitepress/english/picks'
 import ContentCard from './ContentCard.vue'
 import TankLabCard from './TankLabCard.vue'
+import { useEnglishProgress } from './english/useEnglishProgress'
 
 const projects = computed(() => allProjects.filter(({ frontmatter }) => frontmatter.featured).slice(0, 3))
 const posts = computed(() => allPosts.slice(0, 3))
+
+const todayPick = dailyPicks(today)
+const streak = ref(0)
+
+onMounted(() => {
+  streak.value = useEnglishProgress().streakCount(today)
+})
 </script>
 
 <template>
@@ -70,6 +80,26 @@ const posts = computed(() => allPosts.slice(0, 3))
           :date="post.frontmatter.date"
           :tags="post.frontmatter.tags"
         />
+      </div>
+    </section>
+
+    <section class="home-section shell english-section" aria-labelledby="english-title">
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">每日打卡</p>
+          <h2 id="english-title">今日一词</h2>
+        </div>
+        <a :href="withBase('/english/')">进入每日英语 <span aria-hidden="true">→</span></a>
+      </div>
+      <div class="english-teaser english-home-card">
+        <p class="english-teaser-date">{{ today }}</p>
+        <p class="english-teaser-term">
+          <strong>{{ todayPick.word.word }}</strong>
+          <span class="english-teaser-phonetic">{{ todayPick.word.phonetic }}</span>
+        </p>
+        <p class="english-teaser-meaning">{{ todayPick.word.definitions[0].pos }} {{ todayPick.word.definitions[0].meaning }}</p>
+        <p class="english-teaser-example">{{ todayPick.word.exampleEn }}</p>
+        <p v-if="streak > 0" class="english-teaser-streak">已连续打卡 {{ streak }} 天</p>
       </div>
     </section>
 
