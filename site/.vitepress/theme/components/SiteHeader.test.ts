@@ -36,11 +36,13 @@ describe('SiteHeader', () => {
 
     expect(navigation.text()).toContain('项目')
     expect(navigation.text()).toContain('文章')
+    expect(navigation.text()).toContain('英语')
     expect(navigation.text()).toContain('关于')
     expect(navigation.attributes('id')).toBe('primary-navigation')
     expect(navigation.attributes('data-open')).toBe('false')
     expect(menuButton.attributes('aria-expanded')).toBe('false')
     expect(menuButton.attributes('aria-label')).toBe('打开导航菜单')
+    expect(wrapper.get('a[href="/personal-site/english/"]').attributes('href')).toBe('/personal-site/english/')
 
     await menuButton.trigger('click')
 
