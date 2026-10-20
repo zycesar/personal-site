@@ -65,4 +65,36 @@ describe('useEnglishProgress', () => {
     expect(fresh.progress.value.wordMarks['w-001']).toMatchObject({ level: 'fuzzy' })
     expect(fresh.progress.value.quizResults['q-001']).toMatchObject({ picked: 2, correct: false })
   })
+
+  it('stores term marks independently from word marks', () => {
+    const store = useEnglishProgress()
+    store.markWord('w-001', 'known')
+    store.markTerm('t-001', 'known')
+    store.markTerm('t-002', 'fuzzy')
+
+    const fresh = useEnglishProgress()
+    expect(fresh.progress.value.wordMarks['w-001']).toMatchObject({ level: 'known' })
+    expect(fresh.progress.value.termMarks['t-001']).toMatchObject({ level: 'known' })
+    expect(fresh.progress.value.termMarks['t-002']).toMatchObject({ level: 'fuzzy' })
+    expect(fresh.isTermMastered('t-001')).toBe(true)
+    expect(fresh.isTermMastered('t-002')).toBe(false)
+    expect(fresh.masteredCount(['t-001', 't-002', 't-003'])).toBe(1)
+  })
+
+  it('keeps existing progress when termMarks is absent from storage', () => {
+    window.localStorage.setItem(ENGLISH_PROGRESS_KEY, JSON.stringify({
+      checkins: { '2026-10-12': true },
+    }))
+    const store = useEnglishProgress()
+    expect(store.progress.value.checkins['2026-10-12']).toBe(true)
+    expect(store.progress.value.termMarks).toEqual({})
+    expect(store.masteredCount(['t-001'])).toBe(0)
+  })
+
+  it('persists term marks to local storage', () => {
+    const store = useEnglishProgress()
+    store.markTerm('t-001', 'known')
+    const stored = JSON.parse(window.localStorage.getItem(ENGLISH_PROGRESS_KEY)!)
+    expect(stored.termMarks['t-001'].level).toBe('known')
+  })
 })

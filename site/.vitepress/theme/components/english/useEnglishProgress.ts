@@ -4,16 +4,18 @@ import { shiftDate, todayIso } from '../../../english/rotation'
 
 export const ENGLISH_PROGRESS_KEY = 'wyz:english-progress:v1'
 
-export type WordMarkLevel = 'known' | 'fuzzy' | 'unknown'
+export type MarkLevel = 'known' | 'fuzzy' | 'unknown'
+export type WordMarkLevel = MarkLevel
 
 export interface EnglishProgress {
   checkins: Record<string, true>
   wordMarks: Record<string, { level: WordMarkLevel, at: string }>
+  termMarks: Record<string, { level: MarkLevel, at: string }>
   quizResults: Record<string, { picked: number, correct: boolean, at: string }>
 }
 
 function emptyProgress(): EnglishProgress {
-  return { checkins: {}, wordMarks: {}, quizResults: {} }
+  return { checkins: {}, wordMarks: {}, termMarks: {}, quizResults: {} }
 }
 
 function nowIso(): string {
@@ -33,6 +35,7 @@ function readProgress(): EnglishProgress {
     return {
       checkins: isRecord(parsed.checkins) ? parsed.checkins as EnglishProgress['checkins'] : {},
       wordMarks: isRecord(parsed.wordMarks) ? parsed.wordMarks as EnglishProgress['wordMarks'] : {},
+      termMarks: isRecord(parsed.termMarks) ? parsed.termMarks as EnglishProgress['termMarks'] : {},
       quizResults: isRecord(parsed.quizResults) ? parsed.quizResults as EnglishProgress['quizResults'] : {},
     }
   } catch {
@@ -83,5 +86,28 @@ export function useEnglishProgress() {
     persist()
   }
 
-  return { progress, checkIn, isCheckedIn, streakCount, markWord, recordQuiz }
+  function markTerm(termId: string, level: MarkLevel, at: string = nowIso()): void {
+    progress.value.termMarks[termId] = { level, at }
+    persist()
+  }
+
+  function isTermMastered(termId: string): boolean {
+    return progress.value.termMarks[termId]?.level === 'known'
+  }
+
+  function masteredCount(termIds: readonly string[]): number {
+    return termIds.filter((termId) => isTermMastered(termId)).length
+  }
+
+  return {
+    progress,
+    checkIn,
+    isCheckedIn,
+    streakCount,
+    markWord,
+    recordQuiz,
+    markTerm,
+    isTermMastered,
+    masteredCount,
+  }
 }
