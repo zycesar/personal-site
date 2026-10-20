@@ -69,7 +69,7 @@ function handleMark(level: MarkLevel): void {
         <button
           type="button"
           class="speak-button"
-          :aria-label="`播放术语发音：${term.term}`"
+          :aria-label="`听术语：${term.term}`"
           @click="speak(term.sayAs ?? term.term)"
         >
           🔊 听术语
@@ -77,7 +77,7 @@ function handleMark(level: MarkLevel): void {
         <button
           type="button"
           class="speak-button"
-          :aria-label="`播放例句发音：${term.term}`"
+          :aria-label="`听例句：${term.term}`"
           @click="speak(term.exampleEn)"
         >
           🔊 听例句

@@ -2,7 +2,9 @@ import { expect, type Page, test } from '@playwright/test'
 
 const mobileMenu = (page: Page) => page.locator('button[aria-controls="primary-navigation"]')
 const primaryNavigation = (page: Page) => page.locator('nav[aria-label="主导航"]')
-const deploymentBasePath = `/${(process.env.VITE_BASE_PATH ?? '/').replace(/^\/+|\/+$/g, '')}/`
+const basePath = (process.env.VITE_BASE_PATH ?? '').replace(/^\/+|\/+$/g, '')
+// 根路径部署时保持 '/'，子路径部署时补齐前后斜杠
+const deploymentBasePath = basePath === '' ? '/' : `/${basePath}/`
 
 function sitePath(path = '/'): string {
   if (path === '/') return deploymentBasePath

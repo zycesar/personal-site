@@ -5,7 +5,7 @@ layout: terms
 ---
 
 <script setup>
-import TermList from '../.vitepress/theme/components/english/TermList.vue'
+import TermList from '../../.vitepress/theme/components/english/TermList.vue'
 </script>
 
 <p class="engineer-english-kicker">ENGINEER</p>
