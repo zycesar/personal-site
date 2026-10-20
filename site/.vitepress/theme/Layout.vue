@@ -18,6 +18,9 @@ const { frontmatter, page } = useData()
     <HomePage v-else-if="frontmatter.layout === 'home'" />
     <ContentList v-else-if="frontmatter.layout === 'projects'" kind="projects" />
     <ContentList v-else-if="frontmatter.layout === 'posts'" kind="posts" />
+    <article v-else-if="frontmatter.layout === 'terms'" class="terms-page shell">
+      <Content />
+    </article>
     <article v-else class="prose shell">
       <Content />
     </article>

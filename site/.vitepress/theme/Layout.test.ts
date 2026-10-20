@@ -55,4 +55,14 @@ describe('Layout', () => {
     expect(wrapper.get(`[data-list="${kind}"]`).exists()).toBe(true)
     expect(wrapper.text()).not.toContain('Markdown content')
   })
+
+  it('renders the term library on a full width layout', () => {
+    layoutState.frontmatter.layout = 'terms'
+
+    const wrapper = mount(Layout, { global: { stubs: { Content: { template: '<div>Markdown content</div>' } } } })
+
+    expect(wrapper.get('article.terms-page').exists()).toBe(true)
+    expect(wrapper.find('article.prose').exists()).toBe(false)
+    expect(wrapper.text()).toContain('Markdown content')
+  })
 })

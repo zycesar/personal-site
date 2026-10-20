@@ -455,6 +455,39 @@ body > #app > header > button[aria-controls="primary-navigation"] {
   border-radius: 14px;
 }
 
+.terms-page {
+  max-width: none;
+  min-height: calc(100vh - 240px);
+  padding-block: clamp(48px, 7vw, 88px);
+}
+
+.terms-page .engineer-english-kicker {
+  margin: 0;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .14em;
+}
+
+.terms-page h1 {
+  margin: 8px 0 12px;
+  font-size: clamp(2rem, 5vw, 3rem);
+  line-height: 1.25;
+  letter-spacing: -.025em;
+}
+
+.terms-page .engineer-english-subtitle {
+  margin: 0 0 34px;
+  color: var(--muted);
+  font-size: 1.05rem;
+}
+
+.terms-page .engineer-english-note {
+  margin: 34px 0 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
 .site-footer {
   border-top: 1px solid var(--border);
 }
