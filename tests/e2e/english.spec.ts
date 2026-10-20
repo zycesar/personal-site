@@ -12,6 +12,12 @@ async function openMobileMenuIfVisible(page: Page): Promise<void> {
   }
 }
 
+// SSR 渲染时主题按钮的 aria-label 是「切换颜色模式」，水合完成后才变成「切换到深色/浅色模式」。
+// 用它作为水合完成的信号：否则冷启动首次编译较慢时，点击会落在事件绑定之前而被丢弃。
+async function waitForHydration(page: Page): Promise<void> {
+  await expect(page.locator('button[aria-label="切换颜色模式"]')).toHaveCount(0)
+}
+
 test('hub renders the three daily cards and updates date meta', async ({ page }) => {
   await page.goto(sitePath('/english/'))
   await expect(page.getByRole('heading', { level: 1, name: '每日英语' })).toBeVisible()
@@ -72,6 +78,7 @@ test('navigation exposes the term library entry', async ({ page }) => {
 
 test('the term library lists the fullstack track with a mastery counter', async ({ page }) => {
   await page.goto(sitePath('/english/terms/'))
+  await waitForHydration(page)
 
   await expect(page.getByRole('heading', { level: 1, name: '工程师英语' })).toBeVisible()
   await expect(page.locator('.term-card')).toHaveCount(80)
@@ -84,6 +91,7 @@ test('the term library lists the fullstack track with a mastery counter', async 
 
 test('expanding a term reveals its example and the speech actions', async ({ page }) => {
   await page.goto(sitePath('/english/terms/'))
+  await waitForHydration(page)
 
   const card = page.locator('.term-card').first()
   await card.locator('button.term-card-head').click()
@@ -96,6 +104,7 @@ test('expanding a term reveals its example and the speech actions', async ({ pag
 
 test('marking a term as known updates the counter, the progress bar and the badge', async ({ page }) => {
   await page.goto(sitePath('/english/terms/'))
+  await waitForHydration(page)
 
   const card = page.locator('.term-card').first()
   await card.locator('button.term-card-head').click()
@@ -108,6 +117,7 @@ test('marking a term as known updates the counter, the progress bar and the badg
 
 test('switching tracks and filtering by category narrows the list', async ({ page }) => {
   await page.goto(sitePath('/english/terms/'))
+  await waitForHydration(page)
 
   await page.getByRole('button', { name: '前端', exact: true }).click()
   await expect(page.locator('.term-card')).toHaveCount(12)
@@ -131,6 +141,7 @@ test('switching tracks and filtering by category narrows the list', async ({ pag
 
 test('只看未掌握 hides the terms already marked as known', async ({ page }) => {
   await page.goto(sitePath('/english/terms/'))
+  await waitForHydration(page)
 
   const card = page.locator('.term-card').first()
   await card.locator('button.term-card-head').click()
@@ -145,6 +156,7 @@ test('the term library stays usable without speech synthesis', async ({ page }) 
     delete (window as unknown as { speechSynthesis?: unknown }).speechSynthesis
   })
   await page.goto(sitePath('/english/terms/'))
+  await waitForHydration(page)
 
   const card = page.locator('.term-card').first()
   await card.locator('button.term-card-head').click()
