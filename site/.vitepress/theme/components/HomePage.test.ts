@@ -68,6 +68,7 @@ describe('HomePage', () => {
 
     const englishSection = wrapper.get('.english-section')
     expect(englishSection.get('a[href="/personal-site/english/"]').exists()).toBe(true)
+    expect(englishSection.get('a[href="/personal-site/english/terms/"]').exists()).toBe(true)
     expect(englishSection.text()).toContain('今日一词')
     expect(englishSection.text()).toContain('2026-10-12')
   })

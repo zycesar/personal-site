@@ -10,6 +10,7 @@ const links = [
   { label: '文章', href: '/posts/' },
   { label: '实验室', href: '/lab/' },
   { label: '英语', href: '/english/' },
+  { label: '术语', href: '/english/terms/' },
   { label: '关于', href: '/about' },
 ]
 </script>

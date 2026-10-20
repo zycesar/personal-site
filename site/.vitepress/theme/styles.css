@@ -259,6 +259,19 @@ body > #app > header > button[aria-controls="primary-navigation"] {
   font-weight: 750;
 }
 
+.section-links {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.section-links a {
+  color: var(--accent);
+  font-size: .92rem;
+  font-weight: 750;
+}
+
 .project-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));

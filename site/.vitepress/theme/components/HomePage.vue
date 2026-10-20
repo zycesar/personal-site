@@ -89,7 +89,10 @@ onMounted(() => {
           <p class="eyebrow">每日打卡</p>
           <h2 id="english-title">今日一词</h2>
         </div>
-        <a :href="withBase('/english/')">进入每日英语 <span aria-hidden="true">→</span></a>
+        <div class="section-links">
+          <a :href="withBase('/english/')">进入每日英语 <span aria-hidden="true">→</span></a>
+          <a :href="withBase('/english/terms/')">工程术语 <span aria-hidden="true">→</span></a>
+        </div>
       </div>
       <div class="english-teaser english-home-card">
         <p class="english-teaser-date">{{ today }}</p>
