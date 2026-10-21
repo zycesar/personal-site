@@ -168,4 +168,49 @@ describe('useEnglishSpeech', () => {
     utterance.onerror?.({ error: 'language-unavailable' })
     expect(speechErrorText.value).toContain('英文语音包')
   })
+
+  it('ignores the interrupted error caused by our own cancel', () => {
+    vi.useFakeTimers()
+    const synthesis = mockSynthesis([makeVoice('en-US', true, 'Zira')])
+    mount(Host)
+
+    captured!.speak('hello')
+    vi.advanceTimersByTime(120)
+    const utterance = synthesis.speak.mock.calls[0]![0] as UtteranceStub
+
+    // 再次点击时 cancel() 会让上一条 utterance 报 interrupted，这不是故障
+    utterance.onerror?.({ error: 'interrupted' })
+    expect(speechErrorText.value).toBe('')
+  })
+
+  it('ignores the error of an utterance that a newer request replaced', () => {
+    vi.useFakeTimers()
+    const synthesis = mockSynthesis([makeVoice('en-US', true, 'Zira')])
+    mount(Host)
+
+    captured!.speak('hello')
+    vi.advanceTimersByTime(120)
+    const first = synthesis.speak.mock.calls[0]![0] as UtteranceStub
+
+    // 连点第二次：旧 utterance 迟到的报错不能盖掉当前状态
+    captured!.speak('hello again')
+    vi.advanceTimersByTime(120)
+    first.onerror?.({ error: 'not-allowed' })
+    expect(speechErrorText.value).toBe('')
+  })
+
+  it('drops a pending utterance that a newer request replaced', () => {
+    vi.useFakeTimers()
+    const synthesis = mockSynthesis([makeVoice('en-US', true, 'Zira')])
+    mount(Host)
+
+    captured!.speak('hello')
+    captured!.speak('hello again')
+    vi.advanceTimersByTime(120)
+
+    // 只播最新那一次，同一句话不连播两遍
+    expect(synthesis.speak).toHaveBeenCalledTimes(1)
+    const utterance = synthesis.speak.mock.calls[0]![0] as UtteranceStub
+    expect(utterance.text).toBe('hello again')
+  })
 })

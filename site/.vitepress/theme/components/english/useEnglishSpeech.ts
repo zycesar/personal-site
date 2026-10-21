@@ -49,6 +49,9 @@ export const voice = ref<SpeechSynthesisVoice | null>(null)
 export const hasEnglishVoice = ref(false)
 export const speechErrorText = ref('')
 
+/** 发声代次：每次 speak() 自增，只有最新一次有权写状态 */
+let speakGeneration = 0
+
 function loadVoice(): void {
   if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
     voice.value = null
@@ -80,10 +83,14 @@ export function useEnglishSpeech() {
   function speak(text: string): void {
     if (!available.value || typeof window === 'undefined' || !('speechSynthesis' in window)) return
     const synthesis = window.speechSynthesis
+    // 代次令牌：只有最后一次请求能改状态，旧 utterance 迟到的报错一律忽略
+    const generation = ++speakGeneration
     speechErrorText.value = ''
     synthesis.cancel()
     // Chrome 在 cancel 后同一帧 speak 会吞掉语音，延迟执行更稳
     window.setTimeout(() => {
+      // 期间又点了发音，这次作废，免得同一句话连播两遍
+      if (generation !== speakGeneration) return
       // 每次点击都重取一次音色：Chrome 的语音列表是异步就绪的，挂载时的快照可能还是空的
       const voices = synthesis.getVoices()
       const chosen = pickEnglishVoice(voices) ?? pickFallbackVoice(voices)
@@ -91,7 +98,14 @@ export function useEnglishSpeech() {
       utterance.lang = chosen ? chosen.lang : 'en-US'
       utterance.rate = 0.9
       if (chosen) utterance.voice = chosen
+      utterance.onstart = () => {
+        if (generation !== speakGeneration) return
+        speechErrorText.value = ''
+      }
       utterance.onerror = (event) => {
+        if (generation !== speakGeneration) return
+        // interrupted / canceled 是我们自己的 cancel() 造成的，不是故障，不该报给用户
+        if (event.error === 'interrupted' || event.error === 'canceled') return
         speechErrorText.value = SPEECH_ERROR_TEXT[event.error] ?? `发音失败（${event.error}）`
       }
       synthesis.resume()
