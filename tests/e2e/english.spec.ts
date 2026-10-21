@@ -81,10 +81,10 @@ test('the term library lists the fullstack track with a mastery counter', async 
   await waitForHydration(page)
 
   await expect(page.getByRole('heading', { level: 1, name: '工程师英语' })).toBeVisible()
-  await expect(page.locator('.term-card')).toHaveCount(80)
-  await expect(page.locator('.term-progress-count')).toContainText('已掌握 0 / 80')
+  await expect(page.locator('.term-card')).toHaveCount(132)
+  await expect(page.locator('.term-progress-count')).toContainText('已掌握 0 / 132')
   await expect(page.locator('.term-progress-bar')).toHaveAttribute('aria-valuenow', '0')
-  await expect(page.locator('.term-progress-bar')).toHaveAttribute('aria-valuemax', '80')
+  await expect(page.locator('.term-progress-bar')).toHaveAttribute('aria-valuemax', '132')
   await expect(page.locator('.term-card').first().locator('.term-card-term')).toContainText('frontend')
   await expect(page.locator('.term-card').first().locator('.term-card-example')).toHaveCount(0)
 })
@@ -110,7 +110,7 @@ test('marking a term as known updates the counter, the progress bar and the badg
   await card.locator('button.term-card-head').click()
   await card.getByRole('button', { name: '认识', exact: true }).click()
 
-  await expect(page.locator('.term-progress-count')).toContainText('已掌握 1 / 80')
+  await expect(page.locator('.term-progress-count')).toContainText('已掌握 1 / 132')
   await expect(page.locator('.term-progress-bar')).toHaveAttribute('aria-valuenow', '1')
   await expect(card.locator('.term-card-badge')).toHaveText('已掌握')
 })
@@ -120,20 +120,20 @@ test('switching tracks and filtering by category narrows the list', async ({ pag
   await waitForHydration(page)
 
   await page.getByRole('button', { name: '前端', exact: true }).click()
-  await expect(page.locator('.term-card')).toHaveCount(12)
+  await expect(page.locator('.term-card')).toHaveCount(16)
   for (const category of await page.locator('.term-card-category').allTextContents()) {
     expect(category).toBe('前端')
   }
 
   await page.getByRole('button', { name: '全部', exact: true }).click()
-  await expect(page.locator('.term-card')).toHaveCount(80)
+  await expect(page.locator('.term-card')).toHaveCount(132)
 
   await page.getByRole('button', { name: /Agent 工程师/ }).click()
-  await expect(page.locator('.term-card')).toHaveCount(40)
+  await expect(page.locator('.term-card')).toHaveCount(61)
   await expect(page.locator('.term-card').first().locator('.term-card-term')).toContainText('LLM')
 
   await page.getByRole('button', { name: 'RAG', exact: true }).click()
-  await expect(page.locator('.term-card')).toHaveCount(8)
+  await expect(page.locator('.term-card')).toHaveCount(12)
   for (const category of await page.locator('.term-card-category').allTextContents()) {
     expect(category).toBe('RAG')
   }
@@ -148,7 +148,7 @@ test('只看未掌握 hides the terms already marked as known', async ({ page })
   await card.getByRole('button', { name: '认识', exact: true }).click()
 
   await page.getByRole('button', { name: '只看未掌握' }).click()
-  await expect(page.locator('.term-card')).toHaveCount(79)
+  await expect(page.locator('.term-card')).toHaveCount(131)
 })
 
 test('the term library stays usable without speech synthesis', async ({ page }) => {
@@ -163,5 +163,5 @@ test('the term library stays usable without speech synthesis', async ({ page }) 
 
   await expect(card.locator('button.speak-button')).toHaveCount(0)
   await card.getByRole('button', { name: '认识', exact: true }).click()
-  await expect(page.locator('.term-progress-count')).toContainText('已掌握 1 / 80')
+  await expect(page.locator('.term-progress-count')).toContainText('已掌握 1 / 132')
 })

@@ -87,14 +87,14 @@ describe('term schema', () => {
 })
 
 describe('term pool', () => {
-  it('loads 120 terms with unique ids', () => {
-    expect(terms).toHaveLength(120)
-    expect(new Set(terms.map((entry) => entry.id)).size).toBe(120)
+  it('loads 193 terms with unique ids', () => {
+    expect(terms).toHaveLength(193)
+    expect(new Set(terms.map((entry) => entry.id)).size).toBe(193)
   })
 
-  it('splits the pool into 80 fullstack and 40 agent terms', () => {
-    expect(terms.filter((entry) => entry.track === 'fullstack')).toHaveLength(80)
-    expect(terms.filter((entry) => entry.track === 'agent')).toHaveLength(40)
+  it('splits the pool into 132 fullstack and 61 agent terms', () => {
+    expect(terms.filter((entry) => entry.track === 'fullstack')).toHaveLength(132)
+    expect(terms.filter((entry) => entry.track === 'agent')).toHaveLength(61)
   })
 
   it('gives every category a non-trivial number of terms', () => {
@@ -102,8 +102,8 @@ describe('term pool', () => {
     for (const term of terms) {
       counts.set(term.category, (counts.get(term.category) ?? 0) + 1)
     }
-    expect(counts.size).toBeGreaterThanOrEqual(15)
-    for (const count of counts.values()) expect(count).toBeGreaterThanOrEqual(4)
+    expect(counts.size).toBe(15)
+    for (const count of counts.values()) expect(count).toBeGreaterThanOrEqual(12)
   })
 
   it('has no duplicate term text', () => {

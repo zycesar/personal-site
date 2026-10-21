@@ -26,7 +26,7 @@ function filterButton(wrapper: ReturnType<typeof mount>, label: string) {
 describe('TermList', () => {
   it('shows the fullstack track by default and hides the agent track', () => {
     const wrapper = mount(TermList)
-    expect(wrapper.findAll('.term-card')).toHaveLength(80)
+    expect(wrapper.findAll('.term-card')).toHaveLength(132)
     expect(wrapper.text()).toContain('frontend')
     expect(wrapper.text()).not.toContain('vector database')
   })
@@ -35,7 +35,7 @@ describe('TermList', () => {
     const wrapper = mount(TermList)
     await trackButtons(wrapper)[1]!.trigger('click')
 
-    expect(wrapper.findAll('.term-card')).toHaveLength(40)
+    expect(wrapper.findAll('.term-card')).toHaveLength(61)
     expect(wrapper.text()).toContain('vector database')
     expect(wrapper.text()).not.toContain('frontend')
     expect(trackButtons(wrapper)[1]!.attributes('aria-pressed')).toBe('true')
@@ -47,7 +47,7 @@ describe('TermList', () => {
     await filterButton(wrapper, '前端').trigger('click')
 
     const cards = wrapper.findAll('.term-card')
-    expect(cards).toHaveLength(12)
+    expect(cards).toHaveLength(16)
     for (const card of cards) expect(card.get('.term-card-category').text()).toBe('前端')
   })
 
@@ -55,7 +55,7 @@ describe('TermList', () => {
     const wrapper = mount(TermList)
     await filterButton(wrapper, '前端').trigger('click')
     await filterButton(wrapper, '全部').trigger('click')
-    expect(wrapper.findAll('.term-card')).toHaveLength(80)
+    expect(wrapper.findAll('.term-card')).toHaveLength(132)
   })
 
   it('counts mastered terms and updates the progress bar', async () => {
@@ -63,14 +63,14 @@ describe('TermList', () => {
     const progressBar = wrapper.get('.term-progress-bar')
     expect(progressBar.attributes('role')).toBe('progressbar')
     expect(progressBar.attributes('aria-valuenow')).toBe('0')
-    expect(progressBar.attributes('aria-valuemax')).toBe('80')
-    expect(wrapper.get('.term-progress-count').text()).toContain('0 / 80')
+    expect(progressBar.attributes('aria-valuemax')).toBe('132')
+    expect(wrapper.get('.term-progress-count').text()).toContain('0 / 132')
 
     const firstCard = wrapper.get('.term-card')
     await firstCard.get('button.term-card-head').trigger('click')
     await firstCard.get('button.mark-button').trigger('click')
 
-    expect(wrapper.get('.term-progress-count').text()).toContain('1 / 80')
+    expect(wrapper.get('.term-progress-count').text()).toContain('1 / 132')
     expect(wrapper.get('.term-progress-bar').attributes('aria-valuenow')).toBe('1')
   })
 
@@ -83,7 +83,7 @@ describe('TermList', () => {
 
     await wrapper.get('button.term-filter-toggle').trigger('click')
 
-    expect(wrapper.findAll('.term-card')).toHaveLength(79)
+    expect(wrapper.findAll('.term-card')).toHaveLength(131)
     expect(wrapper.get('.term-card-term').text()).not.toBe(marked)
   })
 
