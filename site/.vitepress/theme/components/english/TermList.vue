@@ -8,6 +8,7 @@ import {
   type Track,
 } from '../../../english/catalog'
 import { terms } from '../../../english/load-data'
+import EnglishSpeechHint from './EnglishSpeechHint.vue'
 import TermCard from './TermCard.vue'
 import { useEnglishProgress, type MarkLevel } from './useEnglishProgress'
 
@@ -61,6 +62,8 @@ function handleMark(termId: string, level: MarkLevel): void {
 
 <template>
   <section class="term-list" aria-label="工程师英语术语卡">
+    <EnglishSpeechHint />
+
     <div class="term-tracks" role="group" aria-label="学习方向">
       <button
         v-for="(meta, track) in TRACK_META"

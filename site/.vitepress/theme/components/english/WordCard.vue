@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { WordEntry } from '../../../english/schema'
+import EnglishSpeechHint from './EnglishSpeechHint.vue'
 import { useEnglishProgress, type WordMarkLevel } from './useEnglishProgress'
 import { useEnglishSpeech } from './useEnglishSpeech'
 
@@ -45,6 +46,7 @@ function currentLevel(level: WordMarkLevel): boolean {
         </button>
       </span>
     </div>
+    <EnglishSpeechHint v-if="!readOnly" class="word-card-speech-hint" />
   </article>
 </template>
 
@@ -58,6 +60,7 @@ function currentLevel(level: WordMarkLevel): boolean {
 .word-card-example-en { margin: 14px 0 0; font-style: italic; }
 .word-card-example-zh { margin: 4px 0 0; color: var(--muted); }
 .word-card-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 16px; }
+.word-card-speech-hint { margin-top: 14px; }
 .word-card-actions button { padding: 6px 14px; border: 1px solid var(--border); border-radius: 999px; background: transparent; color: var(--text); cursor: pointer; }
 .word-card-actions button:hover { border-color: var(--accent); }
 .word-card-actions button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); font-weight: 700; }

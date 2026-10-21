@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { defineComponent } from 'vue'
 import { enableAutoUnmount, mount } from '@vue/test-utils'
 
-import { useEnglishSpeech } from './useEnglishSpeech'
+import { speechErrorText, useEnglishSpeech } from './useEnglishSpeech'
 
 enableAutoUnmount(afterEach)
 
@@ -15,6 +15,7 @@ interface UtteranceStub {
   lang: string
   rate: number
   voice: SpeechSynthesisVoice | null
+  onerror?: ((event: { error: string }) => void) | null
 }
 
 let captured: ReturnType<typeof useEnglishSpeech> | undefined
@@ -52,6 +53,7 @@ beforeEach(() => {
   delete (window as unknown as { speechSynthesis?: unknown }).speechSynthesis
   delete (window as unknown as { SpeechSynthesisUtterance?: unknown }).SpeechSynthesisUtterance
   captured = undefined
+  speechErrorText.value = ''
 })
 
 describe('useEnglishSpeech', () => {
@@ -71,6 +73,7 @@ describe('useEnglishSpeech', () => {
 
     mount(Host)
     expect(captured!.available.value).toBe(true)
+    expect(captured!.hasEnglishVoice.value).toBe(true)
 
     captured!.speak('hello')
     // Chrome 在 cancel 后同一帧 speak 会吞掉语音，必须延迟
@@ -101,15 +104,68 @@ describe('useEnglishSpeech', () => {
     vi.useRealTimers()
   })
 
-  it('keeps the en-US lang hint when only non-english voices exist', () => {
+  it('falls back to a local voice when the system has no english voice', () => {
     vi.useFakeTimers()
-    const synthesis = mockSynthesis([makeVoice('zh-CN', true, 'Xiaoxiao')])
+    const synthesis = mockSynthesis([
+      makeVoice('zh-CN', true, 'Xiaoxiao'),
+      makeVoice('zh-CN', true, 'Yaoyao'),
+    ])
     mount(Host)
+    expect(captured!.hasEnglishVoice.value).toBe(false)
+
     captured!.speak('hello')
     vi.advanceTimersByTime(120)
+
+    // 没有英文音色时也要出声：否则 Chrome 解析出「无音色」，start/end 都触发却一点声音都没有
+    const utterance = synthesis.speak.mock.calls[0]![0] as UtteranceStub
+    expect(utterance.voice?.name).toBe('Xiaoxiao')
+    expect(utterance.lang).toBe('zh-CN')
+    vi.useRealTimers()
+  })
+
+  it('keeps the en-US lang hint when the system exposes no voice at all', () => {
+    vi.useFakeTimers()
+    const synthesis = mockSynthesis([])
+    mount(Host)
+    expect(captured!.hasEnglishVoice.value).toBe(false)
+
+    captured!.speak('hello')
+    vi.advanceTimersByTime(120)
+
     const utterance = synthesis.speak.mock.calls[0]![0] as UtteranceStub
     expect(utterance.voice).toBeNull()
     expect(utterance.lang).toBe('en-US')
     vi.useRealTimers()
+  })
+
+  it('re-reads the voice list when speaking so late-loading voices are picked up', () => {
+    vi.useFakeTimers()
+    const voices: SpeechSynthesisVoice[] = []
+    const synthesis = mockSynthesis(voices)
+    mount(Host)
+    expect(captured!.voice.value).toBeNull()
+
+    // Chrome 的语音列表是异步就绪的，挂载时的快照可能还是空的
+    voices.push(makeVoice('en-US', true, 'Zira'))
+    captured!.speak('hello')
+    vi.advanceTimersByTime(120)
+
+    const utterance = synthesis.speak.mock.calls[0]![0] as UtteranceStub
+    expect(utterance.voice?.name).toBe('Zira')
+    expect(utterance.lang).toBe('en-US')
+    vi.useRealTimers()
+  })
+
+  it('surfaces the reason when the synthesis fails', () => {
+    vi.useFakeTimers()
+    const synthesis = mockSynthesis([makeVoice('en-US', true, 'Zira')])
+    mount(Host)
+
+    captured!.speak('hello')
+    vi.advanceTimersByTime(120)
+
+    const utterance = synthesis.speak.mock.calls[0]![0] as UtteranceStub
+    utterance.onerror?.({ error: 'language-unavailable' })
+    expect(speechErrorText.value).toContain('英文语音包')
   })
 })
